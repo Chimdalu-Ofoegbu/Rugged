@@ -265,21 +265,27 @@ function HeaderNav({ route }) {
 
 function Hero() {
   return (
-    <section className="s" data-name="hero" style={{ paddingTop: 72 }}>
+    <section className="s" data-name="hero" style={{ paddingTop: 144 }}>
       <div className="hero-wrap">
         <div className="hero-main">
           <h3 className="display">
             Trade the <span className="ember">moment</span><br />
             a coin <span className="ember">dies</span>.
           </h3>
-          <p className="lede mt-32" style={{ maxWidth: 380 }}>
-            Rugged turns iterativv's blacklist commit log into an on-chain prediction market.
-            Three agents verify. Markets open <span style={{ color: "var(--ink)", fontWeight: 500 }}>in the same block</span> the rug is named.
+          <p className="lede mt-32">
+            Rugged turns iterativv's blacklist commit log into<br />
+            an on-chain prediction market. Three agents verify.<br />
+            Markets open <span style={{ color: "var(--ink)", fontWeight: 500 }}>in the same block</span> the rug is named.
           </p>
           <div className="mt-48 btn-row">
-            <a href="#/markets" className="btn-xl">
-              Browse live markets
-              <span className="arrow">
+            <a href="#/markets" className="btn-xl btn-xl-fx">
+              <span className="arrow arrow-dup" aria-hidden>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+              </span>
+              <span className="btn-xl-fx__text">
+                <span className="btn-xl-fx__label">Browse live markets</span>
+              </span>
+              <span className="arrow" aria-hidden>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
               </span>
             </a>
@@ -344,7 +350,6 @@ function Nutshell() {
   return (
     <section className="s nut-stair-section" data-name="nutshell" id="how">
       <div className="nut-stair-head">
-        <div className="eyebrow">In a nutshell</div>
         <h2 className="nut-stair-title">
           A signal that was ignored<br />
           becomes <span className="ember">a market.</span>
@@ -424,7 +429,7 @@ function Markets() {
     <section className="s" data-name="markets" id="markets">
       <div className="section-head">
         <div className="eyebrow">Live markets</div>
-        <h2 className="section-title">Six rugs<br />pending judgment.</h2>
+        <h2 className="section-title">New rugs pending<br /><span className="ember">judgement</span></h2>
       </div>
       <div className="row" style={{ gap: 6, marginBottom: 24 }}>
         {["hot", "new", "closing"].map((t) => (

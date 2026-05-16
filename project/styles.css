@@ -287,6 +287,7 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: -0.04em;
 }
 .display .ember { color: var(--ember); }
+.section-title .ember { color: var(--ember); }
 
 h2.section-title {
   font-family: var(--display);
@@ -334,6 +335,88 @@ p.lede {
 .btn-xl:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 color-mix(in oklch, white, transparent 70%), 0 1px 0 color-mix(in oklch, black, transparent 50%), 0 18px 40px color-mix(in oklch, var(--ember), transparent 55%); }
 .btn-xl:active { transform: translateY(1px); }
 .btn-xl .arrow { width: 30px; height: 30px; border-radius: 50%; background: color-mix(in oklch, black, transparent 78%); display: grid; place-items: center; }
+
+/* ========== Sui Overflow-style button ========== */
+.btn-xl-fx {
+  position: relative;
+  overflow: hidden;
+  --fx-ease: cubic-bezier(0.525, 0, 0, 1);
+  --fx-dur: 525ms;
+  --fx-icon: 88px;             /* full button-height square */
+  background: var(--ember);
+  color: var(--bg);
+  border-radius: 8px;
+  padding: 0;
+  height: 88px;
+  align-items: stretch;
+  gap: 0;
+  border: 2px solid var(--ember);
+  box-shadow: none;
+}
+/* Override the default lift + glow hover */
+.btn-xl-fx:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Icons — full-height squares, dark accent (color-flipped) */
+.btn-xl-fx .arrow {
+  width: var(--fx-icon);
+  height: 100%;
+  border-radius: 0;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--ember);
+}
+.btn-xl-fx .arrow svg {
+  width: 32px;
+  height: 32px;
+}
+
+/* LEFT duplicate icon — parked off-screen to the left */
+.btn-xl-fx .arrow-dup {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateX(-100%);
+  transition: transform var(--fx-dur) var(--fx-ease);
+  z-index: 2;
+}
+.btn-xl-fx .arrow-dup svg {
+  transform: rotate(-135deg);
+  transition: transform var(--fx-dur) var(--fx-ease);
+}
+
+/* MIDDLE text */
+.btn-xl-fx .btn-xl-fx__text {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 24px;
+  overflow: hidden;
+  transition: transform var(--fx-dur) var(--fx-ease);
+}
+.btn-xl-fx .btn-xl-fx__label {
+  display: inline-block;
+  transition: transform 450ms var(--fx-ease);
+}
+
+/* RIGHT main icon — pushed forward (slides right off-screen) on hover */
+.btn-xl-fx > .arrow:not(.arrow-dup) {
+  transition: transform var(--fx-dur) var(--fx-ease);
+}
+.btn-xl-fx > .arrow:not(.arrow-dup) svg {
+  transform: rotate(-45deg);   /* redirection pose ↗ */
+  transition: transform var(--fx-dur) var(--fx-ease);
+}
+
+/* ===== HOVER ===== */
+.btn-xl-fx:hover .arrow-dup            { transform: translateX(0); }
+.btn-xl-fx:hover .arrow-dup svg        { transform: rotate(0deg); }
+.btn-xl-fx:hover .btn-xl-fx__text      { transform: translateX(var(--fx-icon)); }
+.btn-xl-fx:hover > .arrow:not(.arrow-dup) { transform: translateX(100%); }
 
 .btn-ghost {
   display: inline-flex;
@@ -683,6 +766,7 @@ section.s:last-of-type { border-bottom: 0; }
   color: var(--ink);
   margin: 0;
   white-space: nowrap;
+  text-align: center;
 }
 .nut-stair-title .ember { color: var(--ember); }
 
@@ -1046,10 +1130,11 @@ footer .stamp { margin-top: 36px; font-family: var(--mono); font-size: 10px; col
 }
 
 :root[data-layout="desktop"] .section-head { margin-bottom: 64px; }
+:root[data-layout="desktop"] section[data-name="swarm"] .section-head { margin-bottom: 56px; }
 
 :root[data-layout="desktop"] .display {
-  font-size: clamp(48px, 5.4vw, 76px);
-  line-height: 0.92;
+  font-size: clamp(48px, 6.5vw, 96px);
+  line-height: 0.94;
 }
 
 :root[data-layout="desktop"] h2.section-title {
@@ -1089,6 +1174,11 @@ footer .stamp { margin-top: 36px; font-family: var(--mono); font-size: 10px; col
   max-width: 460px;
   font-size: 24px;
   padding: 26px 28px;
+}
+/* Sui-style FX button strips its padding so the icon squares are flush */
+:root[data-layout="desktop"] .btn-xl-fx {
+  padding: 0;
+  height: 88px;
 }
 
 /* Nutshell — 3-col */
