@@ -4,14 +4,16 @@
     {
       "name": "static: serve (project/)",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "serve", "project", "-l", "5180", "--no-clipboard", "--no-port-switching"],
-      "port": 5180
+      "runtimeArgs": ["--yes", "serve", "project", "--no-clipboard"],
+      "port": 5180,
+      "autoPort": true
     },
     {
       "name": "static: http-server (project/)",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "http-server", "project", "-p", "5181", "-c-1", "--silent"],
-      "port": 5181
+      "runtimeArgs": ["--yes", "http-server", "project", "-c-1", "--silent"],
+      "port": 5181,
+      "autoPort": true
     }
   ]
 }

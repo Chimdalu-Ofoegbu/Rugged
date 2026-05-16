@@ -236,7 +236,7 @@ function HeaderNav({ route }) {
   const items = [
     { lbl: "Markets",    href: "#/markets", chip: "var(--ember)", match: (r) => r.name === "markets" || r.name === "detail" },
     { lbl: "Swarm",      href: "#swarm",    chip: "var(--amber)" },
-    { lbl: "Slash bond", href: "#bond",     chip: "var(--safe)" },
+    { lbl: "Slash bond", href: "#/bond",    chip: "var(--safe)", match: (r) => r.name === "bond" },
     { lbl: "Docs",       href: "#",         chip: "var(--ink-4)" },
     { lbl: "GitHub",     href: "#",         chip: "var(--ink-4)" },
   ];
@@ -251,9 +251,14 @@ function HeaderNav({ route }) {
           </a>
         ))}
       </nav>
-      <a href="#" className="headernav-cta">
-        Start with $5
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 6h6m0 0L6.5 3.5M9 6l-2.5 2.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      <a href="#/markets" className="headernav-cta">
+        <span className="hn-arrow hn-arrow-dup" aria-hidden>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6h6m0 0L6.5 3.5M9 6l-2.5 2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </span>
+        <span className="hn-cta-text">Start with $5</span>
+        <span className="hn-arrow" aria-hidden>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6h6m0 0L6.5 3.5M9 6l-2.5 2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </span>
       </a>
     </header>
   );
@@ -465,9 +470,14 @@ function Markets() {
         ))}
       </div>
       <div className="mt-48">
-        <a href="#/markets" className="btn-xl" style={{ background: "var(--ink)", color: "var(--bg)" }}>
-          See all {MARKETS.length} markets
-          <span className="arrow" style={{ background: "color-mix(in oklch, white, transparent 78%)" }}>
+        <a href="#/markets" className="btn-xl btn-xl-fx btn-xl-fx--ink">
+          <span className="arrow arrow-dup" aria-hidden>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+          </span>
+          <span className="btn-xl-fx__text">
+            <span className="btn-xl-fx__label">See all {MARKETS.length} markets</span>
+          </span>
+          <span className="arrow" aria-hidden>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
           </span>
         </a>
@@ -484,7 +494,11 @@ function Swarm() {
         <div className="eyebrow">The swarm</div>
         <h2 className="section-title">Three agents.<br />One verdict.<br /><span style={{ color: "var(--ember)" }}>Always logged.</span></h2>
       </div>
-      <p className="lede mb-16">Each agent returns a rug-likelihood score and a structured reasoning trace. Consensus of ≥ 2 of 3 above 0.5 triggers market creation. Every trace is SHA-256 hashed to Arc and pinned to IPFS — a permanent audit trail.</p>
+      <p className="lede" style={{ marginBottom: 32, whiteSpace: "nowrap" }}>
+        Each agent returns a rug-likelihood score and a structured reasoning trace.<br />
+        Consensus of ≥ 2 of 3 above 0.5 triggers market creation. Every trace is<br />
+        SHA-256 hashed to Arc and pinned to IPFS — a permanent audit trail.
+      </p>
       <div className="stack gap-12 swarm-list">
         {AGENTS.map((a) => (
           <div className="agent reveal" key={a.role}>
@@ -541,7 +555,7 @@ function Bond() {
         <div className="eyebrow">Slash bond</div>
         <h2 className="section-title">Stake on<br />her reputation,<br />not her vibe.</h2>
       </div>
-      <p className="lede mb-16">Users stake USDC alongside iterativv's blacklist record. The contract tracks her hit-rate over the last 30 resolved markets. Below 70%, bonds slash proportionally and redistribute to remaining holders. A human maintainer's reputation, priced on-chain.</p>
+      <p className="lede" style={{ marginBottom: 32 }}>Users stake USDC alongside iterativv's blacklist record. The contract tracks her hit-rate over the last 30 resolved markets. Below 70%, bonds slash proportionally and redistribute to remaining holders. A human maintainer's reputation, priced on-chain.</p>
       <div className="card bond-card">
         <div className="gauge-wrap">
           <svg viewBox="0 0 200 200" className="gauge">
@@ -560,9 +574,16 @@ function Bond() {
           <div className="stat"><div className="v">$48k</div><div className="k">bonded</div></div>
           <div className="stat"><div className="v">{target}%</div><div className="k">slash floor</div></div>
         </div>
-        <a href="#" className="btn-xl mt-16">
-          Bond on iterativv
-          <span className="arrow"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" /></svg></span>
+        <a href="#/bond" className="btn-xl btn-xl-fx mt-16">
+          <span className="arrow arrow-dup" aria-hidden>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+          </span>
+          <span className="btn-xl-fx__text">
+            <span className="btn-xl-fx__label">Bond on iterativv</span>
+          </span>
+          <span className="arrow" aria-hidden>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+          </span>
         </a>
       </div>
     </section>
@@ -605,13 +626,27 @@ function CTA() {
       <p className="lede mt-16 mb-16">Onboarding via Circle Wallets — email-only, no seed phrases, gas paid in USDC.</p>
       </div>
       <div className="cta-buttons">
-      <a href="#" className="btn-xl mt-16">
-        Start with $5
-        <span className="arrow"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" /></svg></span>
+      <a href="#/markets" className="btn-xl btn-xl-fx mt-16">
+        <span className="arrow arrow-dup" aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+        </span>
+        <span className="btn-xl-fx__text">
+          <span className="btn-xl-fx__label">Start with $5</span>
+        </span>
+        <span className="arrow" aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+        </span>
       </a>
-      <a href="#" className="btn-xl mt-16" style={{ background: "transparent", color: "var(--ink)", border: "1px solid var(--line)", boxShadow: "none" }}>
-        Get Telegram alerts
-        <span className="arrow" style={{ background: "var(--bg-2)" }}><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" /></svg></span>
+      <a href="#" className="btn-xl btn-xl-fx btn-xl-fx--ghost mt-16">
+        <span className="arrow arrow-dup" aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+        </span>
+        <span className="btn-xl-fx__text">
+          <span className="btn-xl-fx__label">Get Telegram alerts</span>
+        </span>
+        <span className="arrow" aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+        </span>
       </a>
       </div>
     </section>
@@ -660,6 +695,7 @@ function parseRoute() {
   const detail = h.match(/^#\/markets\/([^/]+)/);
   if (detail) return { name: "detail", tkr: detail[1].toLowerCase() };
   if (h.startsWith("#/markets")) return { name: "markets" };
+  if (h.startsWith("#/bond")) return { name: "bond" };
   return { name: "home" };
 }
 
@@ -725,6 +761,8 @@ function App() {
             <MarketDetail key={"d-" + route.tkr} tkr={route.tkr} />
           ) : route.name === "markets" ? (
             <MarketsPage key="markets" />
+          ) : route.name === "bond" ? (
+            <BondPage key="bond" />
           ) : (
             <div key="home" className="page-enter">
               <Hero />
