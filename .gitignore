@@ -7,3 +7,25 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Secrets — never commit
+.env
+.env.local
+
+# Foundry / smart contracts
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+# note: uv.lock IS committed (reproducible installs)
+
+# Node / frontend
+node_modules/
+.next/
+dist/
