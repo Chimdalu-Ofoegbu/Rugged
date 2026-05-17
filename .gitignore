@@ -11,6 +11,8 @@ Thumbs.db
 # Secrets — never commit
 .env
 .env.local
+# Circle entity-secret recovery file
+recovery/
 
 # Foundry / smart contracts
 contracts/out/

@@ -19,6 +19,8 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     # telegram alert bot (Phase 7)
     "python-telegram-bot>=21.0",
+    # Circle Developer-Controlled Wallets SDK (entity secret + Phase 5)
+    "circle-developer-controlled-wallets",
 ]
 
 [dependency-groups]
