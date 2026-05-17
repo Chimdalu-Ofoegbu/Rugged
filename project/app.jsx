@@ -283,7 +283,7 @@ function Hero() {
             Markets open <span style={{ color: "var(--ink)", fontWeight: 500 }}>in the same block</span> the rug is named.
           </p>
           <div className="mt-48 btn-row">
-            <a href="#/markets" className="btn-xl btn-xl-fx">
+            <a href="#/markets" className="btn-xl btn-xl-fx btn-xl-fx--fit">
               <span className="arrow arrow-dup" aria-hidden>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
               </span>
@@ -294,10 +294,6 @@ function Hero() {
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
               </span>
             </a>
-          </div>
-          <div className="mt-24 row hero-ghosts" style={{ gap: 8 }}>
-            <a href="#how" className="btn-ghost">How it works</a>
-            <a href="#bond" className="btn-ghost">Slash bond</a>
           </div>
         </div>
         <div className="hero-side">
@@ -470,12 +466,12 @@ function Markets() {
         ))}
       </div>
       <div className="mt-48">
-        <a href="#/markets" className="btn-xl btn-xl-fx btn-xl-fx--ink">
+        <a href="#/markets" className="btn-xl btn-xl-fx btn-xl-fx--ink btn-xl-fx--fit">
           <span className="arrow arrow-dup" aria-hidden>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
           </span>
           <span className="btn-xl-fx__text">
-            <span className="btn-xl-fx__label">See all {MARKETS.length} markets</span>
+            <span className="btn-xl-fx__label">View Markets</span>
           </span>
           <span className="arrow" aria-hidden>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
@@ -703,13 +699,30 @@ function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [booted, setBooted] = useState(false);
   const [route, setRoute] = useState(parseRoute);
+  const routeRef = useRef(route);
   useReveal();
 
   // hash router
   useEffect(() => {
     const onHash = () => {
-      setRoute(parseRoute());
-      window.scrollTo(0, 0);
+      const next = parseRoute();
+      const prev = routeRef.current;
+      routeRef.current = next;
+      setRoute(next);
+
+      // In-page anchor (#swarm, #how, #markets, #bond) → smooth-scroll to that
+      // section. A genuine route change → jump to the top.
+      const anchorId = next.name === "home" && /^#[\w-]+$/.test(location.hash)
+        ? location.hash.slice(1)
+        : null;
+      if (anchorId) {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(anchorId);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      } else if (prev.name !== next.name || prev.tkr !== next.tkr) {
+        window.scrollTo(0, 0);
+      }
     };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);

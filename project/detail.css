@@ -4,6 +4,26 @@
 
 .detail { position: relative; min-height: 100vh; }
 
+/* ============================================================
+   Market switch — directional slide (prev / next navigation)
+   ============================================================ */
+.detail-slide-in   { animation: detailSlideIn   .28s cubic-bezier(.2,.7,0,1); }
+.detail-slide-next { animation: detailSlideNext .32s cubic-bezier(.2,.7,0,1); }
+.detail-slide-prev { animation: detailSlidePrev .32s cubic-bezier(.2,.7,0,1); }
+
+@keyframes detailSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes detailSlideNext {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes detailSlidePrev {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 /* Background art panel */
 .detail-art {
   position: relative;
@@ -244,8 +264,8 @@
   z-index: 5;
 }
 .detail-arrow:hover { background: var(--ember); color: var(--bg); border-color: var(--ember); }
-.detail-arrow.left { left: -20px; }
-.detail-arrow.right { right: -20px; }
+.detail-arrow.left { left: 24px; }
+.detail-arrow.right { right: 24px; }
 
 /* Trace card */
 .detail-trace {

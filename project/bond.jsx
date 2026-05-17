@@ -86,6 +86,9 @@ function BondPage() {
   const baseDelta = ((stake * 0.051) / 12).toFixed(2);   // 5.1% APR / month
   const bearDelta = (stake * 0.12).toFixed(2);           // 12% slash
 
+  // % of the slider track the thumb has passed — drives the ember fill
+  const sliderPct = Math.min(100, Math.max(0, ((stake - 10) / 4990) * 100));
+
   const scenarios = [
     {
       tag: "bull",
@@ -141,7 +144,7 @@ function BondPage() {
 
         <div className="bond-hero-stats">
           <div className="stat"><div className="v tabular">{Math.round(rate)}<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}>%</span></div><div className="k">hit-rate · 30d</div></div>
-          <div className="stat"><div className="v">${(liveBonded / 1000).toFixed(1)}<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}>k</span></div><div className="k">total bonded</div></div>
+          <div className="stat"><div className="v">${(liveBonded / 1000).toFixed(1)}<span style={{ fontSize: ".5em", color: "var(--ink-3)", marginLeft: ".18em" }}>k</span></div><div className="k">total bonded</div></div>
           <div className="stat"><div className="v">{holdersCount}</div><div className="k">bondholders</div></div>
           <div className="stat"><div className="v">70<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}>%</span></div><div className="k">slash floor</div></div>
         </div>
@@ -162,7 +165,7 @@ function BondPage() {
             </div>
             <div className="stake-head-text">
               <div className="eyebrow"><span>Your bond</span></div>
-              <div className="stake-headline">Back her,<br />or sit it out.</div>
+              <div className="stake-headline">Back her, or sit it out.</div>
               <div className="stake-subhead">Stake USDC. Slash exposure recomputes block-by-block from her 30-market window.</div>
             </div>
           </div>
@@ -197,6 +200,7 @@ function BondPage() {
                   step="5"
                   value={stake}
                   className="stake-slider"
+                  style={{ background: `linear-gradient(to right, var(--ember) ${sliderPct}%, var(--bg) ${sliderPct}%)` }}
                   onChange={(e) => setStake(Number(e.target.value))}
                 />
                 <div className="slider-marks">
@@ -218,16 +222,8 @@ function BondPage() {
                 ))}
               </div>
 
-              <button className="btn-xl btn-xl-fx stake-confirm" onClick={() => setConfirmed(true)}>
-                <span className="arrow arrow-dup" aria-hidden>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
-                </span>
-                <span className="btn-xl-fx__text">
-                  <span className="btn-xl-fx__label">Bond ${stake.toLocaleString()} on iterativv</span>
-                </span>
-                <span className="arrow" aria-hidden>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
-                </span>
+              <button className="stake-confirm" onClick={() => setConfirmed(true)}>
+                Bond ${stake.toLocaleString()} on iterativv
               </button>
               <div className="gas-note">paymaster covers gas · 30-block cooldown to unbond · slash floor 70%</div>
             </>

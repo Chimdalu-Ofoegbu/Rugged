@@ -147,8 +147,22 @@
   flex: 0 0 auto;
 }
 .stake-head .gauge { width: 110px; height: 110px; }
-.stake-head .gauge-center .num { font-size: 30px; }
-.stake-head .gauge-center .lbl { font-size: 8px; letter-spacing: 0.18em; margin-top: 2px; }
+.stake-head .gauge-center .num {
+  font-size: 30px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.stake-head .gauge-center .lbl {
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  margin-top: 18px;
+}
 .stake-head-text { flex: 1; min-width: 0; }
 .stake-head-text .eyebrow {
   display: flex; align-items: center; gap: 10px;
@@ -159,10 +173,11 @@
 .stake-headline {
   font-family: var(--display);
   font-weight: var(--display-weight);
-  font-size: clamp(26px, 6vw, 32px);
+  font-size: clamp(20px, 5vw, 28px);
   line-height: 1.02;
   letter-spacing: var(--display-tracking);
   margin: 8px 0 6px;
+  white-space: nowrap;
 }
 .stake-subhead {
   font-size: 13px;
@@ -271,6 +286,12 @@
   border: 3px solid var(--bg-1);
   box-shadow: 0 0 0 1px var(--ember), 0 6px 14px color-mix(in oklch, var(--ember), transparent 70%);
 }
+/* Firefox — native fill for the passed portion of the track */
+.stake-slider::-moz-range-progress {
+  height: 100%;
+  background: var(--ember);
+  border-radius: 2px;
+}
 .slider-marks {
   display: flex;
   justify-content: space-between;
@@ -348,8 +369,31 @@
   margin-top: 10px;
 }
 
-/* confirm CTA — reuses the Sui-style .btn-xl-fx (design + hover animation) */
-.stake-confirm.btn-xl-fx { margin-top: 4px; }
+/* confirm CTA — solid ember, transitions to an orange outline on hover */
+.stake-confirm {
+  margin-top: 4px;
+  width: 100%;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 8px;
+  border: 2px solid var(--ember);
+  background: var(--ember);
+  color: var(--bg);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: background .25s ease, color .25s ease;
+}
+.stake-confirm:hover {
+  background: transparent;
+  color: var(--ember);
+}
+.stake-confirm:active { transform: translateY(1px); }
 
 .gas-note {
   font-family: var(--mono);
@@ -452,7 +496,7 @@
 }
 .pos-amount .usd-lbl {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 16.5px;
   letter-spacing: 0.12em;
   color: var(--ink-3);
   text-transform: uppercase;
@@ -709,7 +753,7 @@
 :root[data-layout="desktop"] .scenario { padding: 16px; }
 :root[data-layout="desktop"] .scenario .s-delta { font-size: 26px; }
 
-:root[data-layout="desktop"] .stake-confirm.btn-xl { max-width: none; }
+:root[data-layout="desktop"] .stake-confirm { font-size: 24px; }
 
 :root[data-layout="desktop"] .resolved-section {
   padding: 80px 64px 120px;

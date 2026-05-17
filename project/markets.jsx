@@ -139,8 +139,6 @@ function MarketsPage() {
           <svg width="10" height="10" viewBox="0 0 10 10"><path d="M7 2L3 5l4 3" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
           back
         </a>
-        <div className="brand">Rugged / Markets</div>
-        <div className="meta">arc · live</div>
       </div>
 
       <section className="mkt-hero">
@@ -207,11 +205,26 @@ function ArtChart({ hist }) {
   );
 }
 
+// Remembers the last-viewed market so the detail view can slide in directionally.
+let lastDetailTkr = null;
+
 function MarketDetail({ tkr }) {
   const idx = Math.max(0, MARKETS.findIndex((m) => m.tkr.toLowerCase() === tkr));
   const m0 = MARKETS[idx];
   const next = MARKETS[(idx + 1) % MARKETS.length];
   const prev = MARKETS[(idx - 1 + MARKETS.length) % MARKETS.length];
+
+  // Slide direction relative to the previously-viewed market (handles wraparound).
+  const [slideDir] = useState(() => {
+    if (lastDetailTkr == null) return "in";
+    const from = MARKETS.findIndex((m) => m.tkr.toLowerCase() === lastDetailTkr);
+    if (from < 0 || from === idx) return "in";
+    const n = MARKETS.length;
+    const delta = idx - from;
+    if (delta === 1 || delta === -(n - 1)) return "next"; // moved forward
+    if (delta === -1 || delta === n - 1) return "prev";   // moved back
+    return "in";
+  });
 
   const [tick, setTick] = useState(0);
   const [side, setSide] = useState(null); // 'rug' | 'safe' | null
@@ -220,6 +233,7 @@ function MarketDetail({ tkr }) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    lastDetailTkr = tkr;
     setSide(null);
     setConfirmed(false);
     setAmount(5);
@@ -243,7 +257,7 @@ function MarketDetail({ tkr }) {
   const payoutMult = side === "rug" ? (1 / prob) : side === "safe" ? (1 / (1 - prob)) : 0;
 
   return (
-    <div className="detail page-enter" key={tkr}>
+    <div className={"detail detail-slide-" + slideDir} key={tkr}>
       <div className="mkt-topnav">
         <a href="#/markets" className="back">
           <svg width="10" height="10" viewBox="0 0 10 10"><path d="M7 2L3 5l4 3" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -268,6 +282,13 @@ function MarketDetail({ tkr }) {
           <h1>{m0.tkr} drops &gt;50%?</h1>
           <div className="sub">blacklist commit · {m0.pool} · resolves in <span className="tabular">{fmtTtl(ttl)}</span></div>
         </div>
+
+        <a href={`#/markets/${prev.tkr.toLowerCase()}`} className="detail-arrow left" aria-label="previous market">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M11 4L6 9l5 5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
+        <a href={`#/markets/${next.tkr.toLowerCase()}`} className="detail-arrow right" aria-label="next market">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M7 4l5 5-5 5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </a>
       </section>
 
       <div className="detail-bet-wrap">
@@ -338,13 +359,6 @@ function MarketDetail({ tkr }) {
             </div>
           )}
         </div>
-
-        <a href={`#/markets/${prev.tkr.toLowerCase()}`} className="detail-arrow left" aria-label="previous market">
-          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M11 4L6 9l5 5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </a>
-        <a href={`#/markets/${next.tkr.toLowerCase()}`} className="detail-arrow right" aria-label="next market">
-          <svg width="18" height="18" viewBox="0 0 18 18"><path d="M7 4l5 5-5 5" stroke="currentColor" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </a>
 
         <div className="detail-trace">
           <div className="eyebrow">Swarm reasoning · 3 of 3</div>
