@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Rugged · contract deployment to Arc testnet.
+# Rugged · deploy the contract suite to Arc testnet.
 #
 # Phase 1. Exports the repo-root .env, then runs the Foundry deploy script
-# against the `arc` RPC endpoint and writes the resulting contract addresses
-# back into .env (MARKET_FACTORY_ADDRESS, … ).
+# against Arc. Copy the printed addresses into .env (MARKET_FACTORY_ADDRESS,
+# MARKET_RESOLUTION_ADDRESS, REPUTATION_BOND_ADDRESS, TRACE_REGISTRY_ADDRESS).
 #
-# STUB — implemented in Phase 1 (project.md §"Phase 1: Smart Contracts").
+# Usage:  bash scripts/deploy.sh
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -16,5 +16,7 @@ set -a
 source "${ROOT}/.env"
 set +a
 
-echo "deploy.sh — Phase 1 stub. Arc RPC: ${ARC_RPC_URL:-<unset>}"
-# Phase 1: forge script contracts/script/Deploy.s.sol --rpc-url arc --broadcast
+cd "${ROOT}/contracts"
+forge script script/Deploy.s.sol:Deploy \
+  --rpc-url "${ARC_RPC_URL}" \
+  --broadcast
