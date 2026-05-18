@@ -31,3 +31,6 @@ __pycache__/
 node_modules/
 .next/
 dist/
+
+# Superseded pitch reference (Phase 6 uses the existing project/ UI)
+rugged-pitch.html
