@@ -1,5 +1,5 @@
 {
-  "generated_at": 1779380938,
+  "generated_at": 1779398193,
   "source": "rugcheck (historical, hand-validated)",
   "total": 30,
   "rug_count": 26,
@@ -10,10 +10,10 @@
       "address": "0xH15700000000000000000000000000000000",
       "market_id": 100000,
       "coin_address": "0xH000000000000000000000000000000000000000",
-      "blacklist_timestamp": 1779121738,
+      "blacklist_timestamp": 1779138993,
       "blacklist_price_micro_usd": 412,
       "seed_probability_bps": 8100,
-      "expiry": 1779726538,
+      "expiry": 1779743793,
       "yes_pool": 1984086000,
       "no_pool": 517914000,
       "yes_odds_bps": 7930,
@@ -24,13 +24,13 @@
       "symbol": "PUMPKAT",
       "chain": "solana",
       "trace": {
-        "hash": "5f03c6d95e38deba52f53d53b4e2f8a95ad9529a665dd07453a6fbd162a1b44d",
-        "uri": "irys://rugged-historical/5f03c6d95e38deba52f53d53b4e2f8a95ad9529a665dd07453a6fbd162a1b44d",
-        "registered_at": 1779121742
+        "hash": "5428765a971b21496c3d497c5235c7c13c75fb217408dd9fae581b1446365f46",
+        "uri": "irys://rugged-historical/5428765a971b21496c3d497c5235c7c13c75fb217408dd9fae581b1446365f46",
+        "registered_at": 1779138997
       },
       "historical": true,
       "source_score": 412,
-      "resolved_timestamp": 1779726538,
+      "resolved_timestamp": 1779743793,
       "resolution_price_micro_usd": 23,
       "drop_pct": -94.4,
       "outcome": "yes",
@@ -40,19 +40,40 @@
           "agent": "contract_analyzer",
           "score": 0.84,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.78,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.81,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -60,10 +81,10 @@
       "address": "0xH15700010000000000000000000000000000",
       "market_id": 100001,
       "coin_address": "0xH000000000000000000000000000000000000001",
-      "blacklist_timestamp": 1778948938,
+      "blacklist_timestamp": 1778966193,
       "blacklist_price_micro_usd": 91,
       "seed_probability_bps": 7567,
-      "expiry": 1779553738,
+      "expiry": 1779570993,
       "yes_pool": 711732000,
       "no_pool": 204268000,
       "yes_odds_bps": 7770,
@@ -74,13 +95,13 @@
       "symbol": "MOONFROG",
       "chain": "solana",
       "trace": {
-        "hash": "3faf5eee26fc6e601c4633ad630870a1e71fbe80a2a4b50377eb908b3beb64f5",
-        "uri": "irys://rugged-historical/3faf5eee26fc6e601c4633ad630870a1e71fbe80a2a4b50377eb908b3beb64f5",
-        "registered_at": 1778948942
+        "hash": "f9f1df89112fb1c19c7af38bc0f141c7a4d3632c1956250003a0234883340249",
+        "uri": "irys://rugged-historical/f9f1df89112fb1c19c7af38bc0f141c7a4d3632c1956250003a0234883340249",
+        "registered_at": 1778966197
       },
       "historical": true,
       "source_score": 388,
-      "resolved_timestamp": 1779553738,
+      "resolved_timestamp": 1779570993,
       "resolution_price_micro_usd": 4,
       "drop_pct": -95.6,
       "outcome": "yes",
@@ -90,19 +111,40 @@
           "agent": "contract_analyzer",
           "score": 0.79,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.71,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.77,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -110,10 +152,10 @@
       "address": "0xH15700020000000000000000000000000000",
       "market_id": 100002,
       "coin_address": "0xH000000000000000000000000000000000000002",
-      "blacklist_timestamp": 1778776138,
+      "blacklist_timestamp": 1778793393,
       "blacklist_price_micro_usd": 1240,
       "seed_probability_bps": 8700,
-      "expiry": 1779380938,
+      "expiry": 1779398193,
       "yes_pool": 1907472000,
       "no_pool": 444528000,
       "yes_odds_bps": 8110,
@@ -124,13 +166,13 @@
       "symbol": "WAGMI42",
       "chain": "solana",
       "trace": {
-        "hash": "c471d7f96450eb25c003c7c7800bd24a0adf521355606319f9fb2da77ed9aba3",
-        "uri": "irys://rugged-historical/c471d7f96450eb25c003c7c7800bd24a0adf521355606319f9fb2da77ed9aba3",
-        "registered_at": 1778776142
+        "hash": "fcaabe6507cdbedd9a34fd49bdca660b2dcb613dba499b3a2aac8795abddc641",
+        "uri": "irys://rugged-historical/fcaabe6507cdbedd9a34fd49bdca660b2dcb613dba499b3a2aac8795abddc641",
+        "registered_at": 1778793397
       },
       "historical": true,
       "source_score": 501,
-      "resolved_timestamp": 1779380938,
+      "resolved_timestamp": 1779398193,
       "resolution_price_micro_usd": 58,
       "drop_pct": -95.3,
       "outcome": "yes",
@@ -140,19 +182,40 @@
           "agent": "contract_analyzer",
           "score": 0.92,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.81,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.88,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -160,10 +223,10 @@
       "address": "0xH15700030000000000000000000000000000",
       "market_id": 100003,
       "coin_address": "0xH000000000000000000000000000000000000003",
-      "blacklist_timestamp": 1778430538,
+      "blacklist_timestamp": 1778447793,
       "blacklist_price_micro_usd": 770,
       "seed_probability_bps": 5700,
-      "expiry": 1779035338,
+      "expiry": 1779052593,
       "yes_pool": 1388646000,
       "no_pool": 537354000,
       "yes_odds_bps": 7210,
@@ -174,13 +237,13 @@
       "symbol": "DEGENPUP",
       "chain": "solana",
       "trace": {
-        "hash": "ec08a4042b3d010688b9a1dfc821557622b8937db1f26361c2f72c13025b0f8d",
-        "uri": "irys://rugged-historical/ec08a4042b3d010688b9a1dfc821557622b8937db1f26361c2f72c13025b0f8d",
-        "registered_at": 1778430542
+        "hash": "19359422463d1cb93949890da1c051c77320b605a14b0996d514c9cd81e4d51a",
+        "uri": "irys://rugged-historical/19359422463d1cb93949890da1c051c77320b605a14b0996d514c9cd81e4d51a",
+        "registered_at": 1778447797
       },
       "historical": true,
       "source_score": 287,
-      "resolved_timestamp": 1779035338,
+      "resolved_timestamp": 1779052593,
       "resolution_price_micro_usd": 380,
       "drop_pct": -50.6,
       "outcome": "yes",
@@ -190,19 +253,39 @@
           "agent": "contract_analyzer",
           "score": 0.61,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.52,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.58,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -210,10 +293,10 @@
       "address": "0xH15700040000000000000000000000000000",
       "market_id": 100004,
       "coin_address": "0xH000000000000000000000000000000000000004",
-      "blacklist_timestamp": 1778344138,
+      "blacklist_timestamp": 1778361393,
       "blacklist_price_micro_usd": 33,
       "seed_probability_bps": 8100,
-      "expiry": 1778948938,
+      "expiry": 1778966193,
       "yes_pool": 2308423000,
       "no_pool": 602577000,
       "yes_odds_bps": 7930,
@@ -224,13 +307,13 @@
       "symbol": "RUGGYBEAR",
       "chain": "solana",
       "trace": {
-        "hash": "03cf27b80c9b091888e670d91ab47b4cc0e085bd64c281623eeb173c09480369",
-        "uri": "irys://rugged-historical/03cf27b80c9b091888e670d91ab47b4cc0e085bd64c281623eeb173c09480369",
-        "registered_at": 1778344142
+        "hash": "56fde7dc2d52b2b0fc2de0850f6bbad1f1a1ab4bf3eacee29e79baa7e3c48f6b",
+        "uri": "irys://rugged-historical/56fde7dc2d52b2b0fc2de0850f6bbad1f1a1ab4bf3eacee29e79baa7e3c48f6b",
+        "registered_at": 1778361397
       },
       "historical": true,
       "source_score": 467,
-      "resolved_timestamp": 1778948938,
+      "resolved_timestamp": 1778966193,
       "resolution_price_micro_usd": 2,
       "drop_pct": -93.9,
       "outcome": "yes",
@@ -240,19 +323,40 @@
           "agent": "contract_analyzer",
           "score": 0.86,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.74,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.83,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -260,10 +364,10 @@
       "address": "0xH15700050000000000000000000000000000",
       "market_id": 100005,
       "coin_address": "0xH000000000000000000000000000000000000005",
-      "blacklist_timestamp": 1778171338,
+      "blacklist_timestamp": 1778188593,
       "blacklist_price_micro_usd": 2150,
       "seed_probability_bps": 6567,
-      "expiry": 1778776138,
+      "expiry": 1778793393,
       "yes_pool": 670806000,
       "no_pool": 227194000,
       "yes_odds_bps": 7470,
@@ -274,13 +378,13 @@
       "symbol": "AIDOGE99",
       "chain": "solana",
       "trace": {
-        "hash": "e98a69839bdf1f3645f69741b3b278bdf94c33dcbcfefe84037f616f7296c3bb",
-        "uri": "irys://rugged-historical/e98a69839bdf1f3645f69741b3b278bdf94c33dcbcfefe84037f616f7296c3bb",
-        "registered_at": 1778171342
+        "hash": "bb6186b1dda67f5b671096c7b3ebbd561511481e1dded6ca19d74b505840094e",
+        "uri": "irys://rugged-historical/bb6186b1dda67f5b671096c7b3ebbd561511481e1dded6ca19d74b505840094e",
+        "registered_at": 1778188597
       },
       "historical": true,
       "source_score": 312,
-      "resolved_timestamp": 1778776138,
+      "resolved_timestamp": 1778793393,
       "resolution_price_micro_usd": 610,
       "drop_pct": -71.6,
       "outcome": "yes",
@@ -290,19 +394,39 @@
           "agent": "contract_analyzer",
           "score": 0.71,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.58,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.68,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -310,10 +434,10 @@
       "address": "0xH15700060000000000000000000000000000",
       "market_id": 100006,
       "coin_address": "0xH000000000000000000000000000000000000006",
-      "blacklist_timestamp": 1778171338,
+      "blacklist_timestamp": 1778188593,
       "blacklist_price_micro_usd": 510,
       "seed_probability_bps": 4100,
-      "expiry": 1778776138,
+      "expiry": 1778793393,
       "yes_pool": 479408000,
       "no_pool": 964592000,
       "yes_odds_bps": 3320,
@@ -324,13 +448,13 @@
       "symbol": "MEMECORE",
       "chain": "solana",
       "trace": {
-        "hash": "add338c9a53b42116a823ef0dd6a151d733e8676dfb0bca67e8bc22fa1f926e3",
-        "uri": "irys://rugged-historical/add338c9a53b42116a823ef0dd6a151d733e8676dfb0bca67e8bc22fa1f926e3",
-        "registered_at": 1778171342
+        "hash": "b9eae96c4ceb25f996d3d8ca32f966cf5f54bb4fce360e1a19b3d268cfad5e9a",
+        "uri": "irys://rugged-historical/b9eae96c4ceb25f996d3d8ca32f966cf5f54bb4fce360e1a19b3d268cfad5e9a",
+        "registered_at": 1778188597
       },
       "historical": true,
       "source_score": 198,
-      "resolved_timestamp": 1778776138,
+      "resolved_timestamp": 1778793393,
       "resolution_price_micro_usd": 680,
       "drop_pct": 33.3,
       "outcome": "no",
@@ -340,19 +464,40 @@
           "agent": "contract_analyzer",
           "score": 0.41,
           "confidence": 0.9,
-          "summary": "Mint renounced; ownership burned; LP locked > 90 days; clean honeypot scan."
+          "key_signals": [
+            "Mint authority renounced",
+            "Ownership burned to zero address",
+            "LP locked >90 days via Streamflow",
+            "Honeypot heuristics clean across 6 simulated swaps"
+          ],
+          "reasoning": "Contract is structurally clean: mint and ownership are both irrevocable, the LP is locked well past any plausible exit window, and the honeypot simulator found no asymmetric transfer logic. Low rug surface area from the contract side.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.38,
           "confidence": 0.85,
-          "summary": "Organic sentiment; dev active in 3 community channels."
+          "key_signals": [
+            "Organic sentiment across X and Telegram",
+            "Dev active in 3 community channels in last 24h",
+            "No detectable account coordination",
+            "Sentiment-to-price correlation within healthy band"
+          ],
+          "reasoning": "Social profile is consistent with an organic community: active dev presence, no synchronized promotional accounts, sentiment moving in line with price. Nothing anomalous from the social-signal side.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.44,
           "confidence": 0.92,
-          "summary": "LP stable; dev wallets dormant; holder distribution gini < 0.45."
+          "key_signals": [
+            "LP depth stable for >72h",
+            "Dev wallets dormant",
+            "Top-holder gini coefficient <0.45 (healthy)",
+            "No abnormal CEX deposit flow"
+          ],
+          "reasoning": "On-chain flow is benign: LP depth has been stable through several days, dev wallets are dormant, and holder distribution is well-spread. No precursors to a coordinated dump.",
+          "evidence": {}
         }
       ]
     },
@@ -360,10 +505,10 @@
       "address": "0xH15700070000000000000000000000000000",
       "market_id": 100007,
       "coin_address": "0xH000000000000000000000000000000000000007",
-      "blacklist_timestamp": 1777912138,
+      "blacklist_timestamp": 1777929393,
       "blacklist_price_micro_usd": 88,
       "seed_probability_bps": 7700,
-      "expiry": 1778516938,
+      "expiry": 1778534193,
       "yes_pool": 2460150000,
       "no_pool": 689850000,
       "yes_odds_bps": 7810,
@@ -374,13 +519,13 @@
       "symbol": "FLOKICAT",
       "chain": "solana",
       "trace": {
-        "hash": "9b7cf1cb259976d8b0a072e77c60f3e4560d32054cf0885067d089d3bb26e7f2",
-        "uri": "irys://rugged-historical/9b7cf1cb259976d8b0a072e77c60f3e4560d32054cf0885067d089d3bb26e7f2",
-        "registered_at": 1777912142
+        "hash": "cf2f53467cef65287c4cc5aa234fa65483aa15308c75d5ed05ebfea216d03622",
+        "uri": "irys://rugged-historical/cf2f53467cef65287c4cc5aa234fa65483aa15308c75d5ed05ebfea216d03622",
+        "registered_at": 1777929397
       },
       "historical": true,
       "source_score": 421,
-      "resolved_timestamp": 1778516938,
+      "resolved_timestamp": 1778534193,
       "resolution_price_micro_usd": 5,
       "drop_pct": -94.3,
       "outcome": "yes",
@@ -390,19 +535,39 @@
           "agent": "contract_analyzer",
           "score": 0.83,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.69,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.79,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -410,10 +575,10 @@
       "address": "0xH15700080000000000000000000000000000",
       "market_id": 100008,
       "coin_address": "0xH000000000000000000000000000000000000008",
-      "blacklist_timestamp": 1777825738,
+      "blacklist_timestamp": 1777842993,
       "blacklist_price_micro_usd": 172,
       "seed_probability_bps": 7267,
-      "expiry": 1778430538,
+      "expiry": 1778447793,
       "yes_pool": 991488000,
       "no_pool": 299512000,
       "yes_odds_bps": 7680,
@@ -424,13 +589,13 @@
       "symbol": "PEPECHAIN",
       "chain": "solana",
       "trace": {
-        "hash": "2e6487870d8b7471dc4a0988c843b4c412d8c8432dccf9fd92dd1ebc20efeb91",
-        "uri": "irys://rugged-historical/2e6487870d8b7471dc4a0988c843b4c412d8c8432dccf9fd92dd1ebc20efeb91",
-        "registered_at": 1777825742
+        "hash": "08d0cffea32e8b13dd8902b4c7f0a6acc5b8bf443256bdfaa22f873bf7f3ca85",
+        "uri": "irys://rugged-historical/08d0cffea32e8b13dd8902b4c7f0a6acc5b8bf443256bdfaa22f873bf7f3ca85",
+        "registered_at": 1777842997
       },
       "historical": true,
       "source_score": 389,
-      "resolved_timestamp": 1778430538,
+      "resolved_timestamp": 1778447793,
       "resolution_price_micro_usd": 11,
       "drop_pct": -93.6,
       "outcome": "yes",
@@ -440,19 +605,39 @@
           "agent": "contract_analyzer",
           "score": 0.78,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.66,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.74,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -460,10 +645,10 @@
       "address": "0xH15700090000000000000000000000000000",
       "market_id": 100009,
       "coin_address": "0xH000000000000000000000000000000000000009",
-      "blacklist_timestamp": 1777566538,
+      "blacklist_timestamp": 1777583793,
       "blacklist_price_micro_usd": 940,
       "seed_probability_bps": 5500,
-      "expiry": 1778171338,
+      "expiry": 1778188593,
       "yes_pool": 474840000,
       "no_pool": 844160000,
       "yes_odds_bps": 3600,
@@ -474,13 +659,13 @@
       "symbol": "ROCKETSOL",
       "chain": "solana",
       "trace": {
-        "hash": "1de5de0871cd33db0c4615b9949e4b311b2ce459ce31762caefc75c7bd7d323c",
-        "uri": "irys://rugged-historical/1de5de0871cd33db0c4615b9949e4b311b2ce459ce31762caefc75c7bd7d323c",
-        "registered_at": 1777566542
+        "hash": "c6ce10ef1725383ab54cf22ccfdc79d17a7c0eefc9770e98b0e220730a771f5f",
+        "uri": "irys://rugged-historical/c6ce10ef1725383ab54cf22ccfdc79d17a7c0eefc9770e98b0e220730a771f5f",
+        "registered_at": 1777583797
       },
       "historical": true,
       "source_score": 256,
-      "resolved_timestamp": 1778171338,
+      "resolved_timestamp": 1778188593,
       "resolution_price_micro_usd": 490,
       "drop_pct": -47.9,
       "outcome": "no",
@@ -490,19 +675,40 @@
           "agent": "contract_analyzer",
           "score": 0.55,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.49,
           "confidence": 0.85,
-          "summary": "Organic sentiment; dev active in 3 community channels."
+          "key_signals": [
+            "Organic sentiment across X and Telegram",
+            "Dev active in 3 community channels in last 24h",
+            "No detectable account coordination",
+            "Sentiment-to-price correlation within healthy band"
+          ],
+          "reasoning": "Social profile is consistent with an organic community: active dev presence, no synchronized promotional accounts, sentiment moving in line with price. Nothing anomalous from the social-signal side.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.61,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -510,10 +716,10 @@
       "address": "0xH157000a0000000000000000000000000000",
       "market_id": 100010,
       "coin_address": "0xH00000000000000000000000000000000000000a",
-      "blacklist_timestamp": 1777480138,
+      "blacklist_timestamp": 1777497393,
       "blacklist_price_micro_usd": 22,
       "seed_probability_bps": 8367,
-      "expiry": 1778084938,
+      "expiry": 1778102193,
       "yes_pool": 1106181000,
       "no_pool": 274819000,
       "yes_odds_bps": 8010,
@@ -524,13 +730,13 @@
       "symbol": "MOONLAMBO",
       "chain": "solana",
       "trace": {
-        "hash": "eb081b389ce46f509fd9109de0090f914582af79a61a22344aa6ffb8943bd67a",
-        "uri": "irys://rugged-historical/eb081b389ce46f509fd9109de0090f914582af79a61a22344aa6ffb8943bd67a",
-        "registered_at": 1777480142
+        "hash": "7ab9ae6b8ea2afd950b995387f5bbb2fedc48e8a4a425e97d6460e1835711c0a",
+        "uri": "irys://rugged-historical/7ab9ae6b8ea2afd950b995387f5bbb2fedc48e8a4a425e97d6460e1835711c0a",
+        "registered_at": 1777497397
       },
       "historical": true,
       "source_score": 478,
-      "resolved_timestamp": 1778084938,
+      "resolved_timestamp": 1778102193,
       "resolution_price_micro_usd": 1,
       "drop_pct": -95.5,
       "outcome": "yes",
@@ -540,19 +746,40 @@
           "agent": "contract_analyzer",
           "score": 0.88,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.79,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.84,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -560,10 +787,10 @@
       "address": "0xH157000b0000000000000000000000000000",
       "market_id": 100011,
       "coin_address": "0xH00000000000000000000000000000000000000b",
-      "blacklist_timestamp": 1777307338,
+      "blacklist_timestamp": 1777324593,
       "blacklist_price_micro_usd": 345,
       "seed_probability_bps": 7667,
-      "expiry": 1777912138,
+      "expiry": 1777929393,
       "yes_pool": 1699620000,
       "no_pool": 479380000,
       "yes_odds_bps": 7800,
@@ -574,13 +801,13 @@
       "symbol": "TRUMPDOG",
       "chain": "solana",
       "trace": {
-        "hash": "bf8c33b9d9139ed3e2d971ff3aac6621682d52d82005b5312f08da2498bbfbbb",
-        "uri": "irys://rugged-historical/bf8c33b9d9139ed3e2d971ff3aac6621682d52d82005b5312f08da2498bbfbbb",
-        "registered_at": 1777307342
+        "hash": "6c0887cce3ea8c75ea06e0dbb1e5526ce8bc6fd68f69bd517c799cdf376205d3",
+        "uri": "irys://rugged-historical/6c0887cce3ea8c75ea06e0dbb1e5526ce8bc6fd68f69bd517c799cdf376205d3",
+        "registered_at": 1777324597
       },
       "historical": true,
       "source_score": 401,
-      "resolved_timestamp": 1777912138,
+      "resolved_timestamp": 1777929393,
       "resolution_price_micro_usd": 18,
       "drop_pct": -94.8,
       "outcome": "yes",
@@ -590,19 +817,40 @@
           "agent": "contract_analyzer",
           "score": 0.81,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.72,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.77,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -610,10 +858,10 @@
       "address": "0xH157000c0000000000000000000000000000",
       "market_id": 100012,
       "coin_address": "0xH00000000000000000000000000000000000000c",
-      "blacklist_timestamp": 1777134538,
+      "blacklist_timestamp": 1777151793,
       "blacklist_price_micro_usd": 64,
       "seed_probability_bps": 6867,
-      "expiry": 1777739338,
+      "expiry": 1777756593,
       "yes_pool": 1135512000,
       "no_pool": 366488000,
       "yes_odds_bps": 7560,
@@ -624,13 +872,13 @@
       "symbol": "CYBERPEPE",
       "chain": "solana",
       "trace": {
-        "hash": "d5ad3a82c1dbfef6f4b87cc2bae116252e80d1613a09380e9579f12bb846980b",
-        "uri": "irys://rugged-historical/d5ad3a82c1dbfef6f4b87cc2bae116252e80d1613a09380e9579f12bb846980b",
-        "registered_at": 1777134542
+        "hash": "14dedde952d97c1340b33c3293be731919e55062d1421d9016c0080d28fc142d",
+        "uri": "irys://rugged-historical/14dedde952d97c1340b33c3293be731919e55062d1421d9016c0080d28fc142d",
+        "registered_at": 1777151797
       },
       "historical": true,
       "source_score": 369,
-      "resolved_timestamp": 1777739338,
+      "resolved_timestamp": 1777756593,
       "resolution_price_micro_usd": 28,
       "drop_pct": -56.2,
       "outcome": "yes",
@@ -640,19 +888,39 @@
           "agent": "contract_analyzer",
           "score": 0.74,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.61,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.71,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -660,10 +928,10 @@
       "address": "0xH157000d0000000000000000000000000000",
       "market_id": 100013,
       "coin_address": "0xH00000000000000000000000000000000000000d",
-      "blacklist_timestamp": 1776961738,
+      "blacklist_timestamp": 1776978993,
       "blacklist_price_micro_usd": 510,
       "seed_probability_bps": 8100,
-      "expiry": 1777566538,
+      "expiry": 1777583793,
       "yes_pool": 2870660000,
       "no_pool": 749340000,
       "yes_odds_bps": 7930,
@@ -674,13 +942,13 @@
       "symbol": "ELONMUSKY",
       "chain": "solana",
       "trace": {
-        "hash": "719b52397b817af11b90a72fcb6d559e77b8a259f751c4ae066cc038ca292643",
-        "uri": "irys://rugged-historical/719b52397b817af11b90a72fcb6d559e77b8a259f751c4ae066cc038ca292643",
-        "registered_at": 1776961742
+        "hash": "251c62b42eca91c35b8ebbe5881332f22a0337e79a09ca8f8f1a6eebe6cf9bd5",
+        "uri": "irys://rugged-historical/251c62b42eca91c35b8ebbe5881332f22a0337e79a09ca8f8f1a6eebe6cf9bd5",
+        "registered_at": 1776978997
       },
       "historical": true,
       "source_score": 444,
-      "resolved_timestamp": 1777566538,
+      "resolved_timestamp": 1777583793,
       "resolution_price_micro_usd": 31,
       "drop_pct": -93.9,
       "outcome": "yes",
@@ -690,19 +958,40 @@
           "agent": "contract_analyzer",
           "score": 0.85,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.76,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.82,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -710,10 +999,10 @@
       "address": "0xH157000e0000000000000000000000000000",
       "market_id": 100014,
       "coin_address": "0xH00000000000000000000000000000000000000e",
-      "blacklist_timestamp": 1776702538,
+      "blacklist_timestamp": 1776719793,
       "blacklist_price_micro_usd": 128,
       "seed_probability_bps": 6633,
-      "expiry": 1777307338,
+      "expiry": 1777324593,
       "yes_pool": 2649213000,
       "no_pool": 887787000,
       "yes_odds_bps": 7490,
@@ -724,13 +1013,13 @@
       "symbol": "DEGENAPE",
       "chain": "solana",
       "trace": {
-        "hash": "0df1c86390c3b42f3a676279a7067cd5804ee4764c1244d59beeff08ea73f939",
-        "uri": "irys://rugged-historical/0df1c86390c3b42f3a676279a7067cd5804ee4764c1244d59beeff08ea73f939",
-        "registered_at": 1776702542
+        "hash": "75909f94fb1a6ed9962886aaddf54a9de35d85f91be1a48132d04409375da29f",
+        "uri": "irys://rugged-historical/75909f94fb1a6ed9962886aaddf54a9de35d85f91be1a48132d04409375da29f",
+        "registered_at": 1776719797
       },
       "historical": true,
       "source_score": 321,
-      "resolved_timestamp": 1777307338,
+      "resolved_timestamp": 1777324593,
       "resolution_price_micro_usd": 9,
       "drop_pct": -93.0,
       "outcome": "yes",
@@ -740,19 +1029,39 @@
           "agent": "contract_analyzer",
           "score": 0.69,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.58,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.72,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -760,10 +1069,10 @@
       "address": "0xH157000f0000000000000000000000000000",
       "market_id": 100015,
       "coin_address": "0xH00000000000000000000000000000000000000f",
-      "blacklist_timestamp": 1776529738,
+      "blacklist_timestamp": 1776546993,
       "blacklist_price_micro_usd": 41,
       "seed_probability_bps": 6967,
-      "expiry": 1777134538,
+      "expiry": 1777151793,
       "yes_pool": 1992375000,
       "no_pool": 632625000,
       "yes_odds_bps": 7590,
@@ -774,13 +1083,13 @@
       "symbol": "SHIBKILLER",
       "chain": "solana",
       "trace": {
-        "hash": "6df459ec8c7c967f38b871841d4ecec652c471e91ef19cdabfbf1689519f9fbc",
-        "uri": "irys://rugged-historical/6df459ec8c7c967f38b871841d4ecec652c471e91ef19cdabfbf1689519f9fbc",
-        "registered_at": 1776529742
+        "hash": "763959896c8172a5221bfd2f2d7a43043aefcfe73d6ea7c2a702861dadebcd83",
+        "uri": "irys://rugged-historical/763959896c8172a5221bfd2f2d7a43043aefcfe73d6ea7c2a702861dadebcd83",
+        "registered_at": 1776546997
       },
       "historical": true,
       "source_score": 358,
-      "resolved_timestamp": 1777134538,
+      "resolved_timestamp": 1777151793,
       "resolution_price_micro_usd": 3,
       "drop_pct": -92.7,
       "outcome": "yes",
@@ -790,19 +1099,39 @@
           "agent": "contract_analyzer",
           "score": 0.76,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.63,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.7,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -810,10 +1139,10 @@
       "address": "0xH15700100000000000000000000000000000",
       "market_id": 100016,
       "coin_address": "0xH000000000000000000000000000000000000010",
-      "blacklist_timestamp": 1776356938,
+      "blacklist_timestamp": 1776374193,
       "blacklist_price_micro_usd": 288,
       "seed_probability_bps": 6167,
-      "expiry": 1776961738,
+      "expiry": 1776978993,
       "yes_pool": 1413405000,
       "no_pool": 509595000,
       "yes_odds_bps": 7350,
@@ -824,13 +1153,13 @@
       "symbol": "BONKDADDY",
       "chain": "solana",
       "trace": {
-        "hash": "d177a3ca22613cd5f827a3c07866c0b538dd7c2820701821d9842d0e76612219",
-        "uri": "irys://rugged-historical/d177a3ca22613cd5f827a3c07866c0b538dd7c2820701821d9842d0e76612219",
-        "registered_at": 1776356942
+        "hash": "44456713685f2bd5258802e72fbc4bc719eec58b2f49f883b3ec38e2d5a78a63",
+        "uri": "irys://rugged-historical/44456713685f2bd5258802e72fbc4bc719eec58b2f49f883b3ec38e2d5a78a63",
+        "registered_at": 1776374197
       },
       "historical": true,
       "source_score": 295,
-      "resolved_timestamp": 1776961738,
+      "resolved_timestamp": 1776978993,
       "resolution_price_micro_usd": 19,
       "drop_pct": -93.4,
       "outcome": "yes",
@@ -840,19 +1169,39 @@
           "agent": "contract_analyzer",
           "score": 0.66,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.54,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.65,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -860,10 +1209,10 @@
       "address": "0xH15700110000000000000000000000000000",
       "market_id": 100017,
       "coin_address": "0xH000000000000000000000000000000000000011",
-      "blacklist_timestamp": 1776184138,
+      "blacklist_timestamp": 1776201393,
       "blacklist_price_micro_usd": 77,
       "seed_probability_bps": 8100,
-      "expiry": 1776788938,
+      "expiry": 1776806193,
       "yes_pool": 647088000,
       "no_pool": 168912000,
       "yes_odds_bps": 7930,
@@ -874,13 +1223,13 @@
       "symbol": "GIGAMOON",
       "chain": "solana",
       "trace": {
-        "hash": "1c54303779c601d3e70f155ffafae5b6494e544e6dad82424d06bdee398013ca",
-        "uri": "irys://rugged-historical/1c54303779c601d3e70f155ffafae5b6494e544e6dad82424d06bdee398013ca",
-        "registered_at": 1776184142
+        "hash": "e5a7465f50a10815291a90ea98bcbbf8f32b67fbe6030bdef3a84dc408c4c1f2",
+        "uri": "irys://rugged-historical/e5a7465f50a10815291a90ea98bcbbf8f32b67fbe6030bdef3a84dc408c4c1f2",
+        "registered_at": 1776201397
       },
       "historical": true,
       "source_score": 463,
-      "resolved_timestamp": 1776788938,
+      "resolved_timestamp": 1776806193,
       "resolution_price_micro_usd": 4,
       "drop_pct": -94.8,
       "outcome": "yes",
@@ -890,19 +1239,40 @@
           "agent": "contract_analyzer",
           "score": 0.87,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.74,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.82,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -910,10 +1280,10 @@
       "address": "0xH15700120000000000000000000000000000",
       "market_id": 100018,
       "coin_address": "0xH000000000000000000000000000000000000012",
-      "blacklist_timestamp": 1776011338,
+      "blacklist_timestamp": 1776028593,
       "blacklist_price_micro_usd": 1880,
       "seed_probability_bps": 7433,
-      "expiry": 1776616138,
+      "expiry": 1776633393,
       "yes_pool": 1150997000,
       "no_pool": 338003000,
       "yes_odds_bps": 7730,
@@ -924,13 +1294,13 @@
       "symbol": "AICOIN404",
       "chain": "solana",
       "trace": {
-        "hash": "c4ffc22e0c258985672569f34a09adbdb55bc4d30653aa2ccaf3f4d4db674869",
-        "uri": "irys://rugged-historical/c4ffc22e0c258985672569f34a09adbdb55bc4d30653aa2ccaf3f4d4db674869",
-        "registered_at": 1776011342
+        "hash": "f829ec667b7f37ce1206461db7c9a75fbdb801995358de205b933e2e216568b5",
+        "uri": "irys://rugged-historical/f829ec667b7f37ce1206461db7c9a75fbdb801995358de205b933e2e216568b5",
+        "registered_at": 1776028597
       },
       "historical": true,
       "source_score": 391,
-      "resolved_timestamp": 1776616138,
+      "resolved_timestamp": 1776633393,
       "resolution_price_micro_usd": 94,
       "drop_pct": -95.0,
       "outcome": "yes",
@@ -940,19 +1310,39 @@
           "agent": "contract_analyzer",
           "score": 0.79,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.68,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.76,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -960,10 +1350,10 @@
       "address": "0xH15700130000000000000000000000000000",
       "market_id": 100019,
       "coin_address": "0xH000000000000000000000000000000000000013",
-      "blacklist_timestamp": 1775838538,
+      "blacklist_timestamp": 1775855793,
       "blacklist_price_micro_usd": 156,
       "seed_probability_bps": 7700,
-      "expiry": 1776443338,
+      "expiry": 1776460593,
       "yes_pool": 1700237000,
       "no_pool": 476763000,
       "yes_odds_bps": 7810,
@@ -974,13 +1364,13 @@
       "symbol": "RABBITAPE",
       "chain": "solana",
       "trace": {
-        "hash": "8cc884ebcb9d62b7bd6ecf1190c14dd3fd1099e333f621722166378323c6333e",
-        "uri": "irys://rugged-historical/8cc884ebcb9d62b7bd6ecf1190c14dd3fd1099e333f621722166378323c6333e",
-        "registered_at": 1775838542
+        "hash": "27c86fd8c1d9579c535d4981165a15440fbe5835e6eb063c0a63a58aaa00eb56",
+        "uri": "irys://rugged-historical/27c86fd8c1d9579c535d4981165a15440fbe5835e6eb063c0a63a58aaa00eb56",
+        "registered_at": 1775855797
       },
       "historical": true,
       "source_score": 412,
-      "resolved_timestamp": 1776443338,
+      "resolved_timestamp": 1776460593,
       "resolution_price_micro_usd": 10,
       "drop_pct": -93.6,
       "outcome": "yes",
@@ -990,19 +1380,40 @@
           "agent": "contract_analyzer",
           "score": 0.82,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.71,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.78,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -1010,10 +1421,10 @@
       "address": "0xH15700140000000000000000000000000000",
       "market_id": 100020,
       "coin_address": "0xH000000000000000000000000000000000000014",
-      "blacklist_timestamp": 1775665738,
+      "blacklist_timestamp": 1775682993,
       "blacklist_price_micro_usd": 460,
       "seed_probability_bps": 4500,
-      "expiry": 1776270538,
+      "expiry": 1776287793,
       "yes_pool": 1117580000,
       "no_pool": 2169420000,
       "yes_odds_bps": 3400,
@@ -1024,13 +1435,13 @@
       "symbol": "DEGENFLR",
       "chain": "solana",
       "trace": {
-        "hash": "e29bcb1c3a1dc4c851b83336a0e00ff414b151fed97045f38bb324bb4224bb5e",
-        "uri": "irys://rugged-historical/e29bcb1c3a1dc4c851b83336a0e00ff414b151fed97045f38bb324bb4224bb5e",
-        "registered_at": 1775665742
+        "hash": "c5d3b10b365deda90984efdf69a987f2349b23374c0efbb1f98bda56f3515638",
+        "uri": "irys://rugged-historical/c5d3b10b365deda90984efdf69a987f2349b23374c0efbb1f98bda56f3515638",
+        "registered_at": 1775682997
       },
       "historical": true,
       "source_score": 218,
-      "resolved_timestamp": 1776270538,
+      "resolved_timestamp": 1776287793,
       "resolution_price_micro_usd": 310,
       "drop_pct": -32.6,
       "outcome": "no",
@@ -1040,19 +1451,40 @@
           "agent": "contract_analyzer",
           "score": 0.46,
           "confidence": 0.9,
-          "summary": "Mint renounced; ownership burned; LP locked > 90 days; clean honeypot scan."
+          "key_signals": [
+            "Mint authority renounced",
+            "Ownership burned to zero address",
+            "LP locked >90 days via Streamflow",
+            "Honeypot heuristics clean across 6 simulated swaps"
+          ],
+          "reasoning": "Contract is structurally clean: mint and ownership are both irrevocable, the LP is locked well past any plausible exit window, and the honeypot simulator found no asymmetric transfer logic. Low rug surface area from the contract side.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.41,
           "confidence": 0.85,
-          "summary": "Organic sentiment; dev active in 3 community channels."
+          "key_signals": [
+            "Organic sentiment across X and Telegram",
+            "Dev active in 3 community channels in last 24h",
+            "No detectable account coordination",
+            "Sentiment-to-price correlation within healthy band"
+          ],
+          "reasoning": "Social profile is consistent with an organic community: active dev presence, no synchronized promotional accounts, sentiment moving in line with price. Nothing anomalous from the social-signal side.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.48,
           "confidence": 0.92,
-          "summary": "LP stable; dev wallets dormant; holder distribution gini < 0.45."
+          "key_signals": [
+            "LP depth stable for >72h",
+            "Dev wallets dormant",
+            "Top-holder gini coefficient <0.45 (healthy)",
+            "No abnormal CEX deposit flow"
+          ],
+          "reasoning": "On-chain flow is benign: LP depth has been stable through several days, dev wallets are dormant, and holder distribution is well-spread. No precursors to a coordinated dump.",
+          "evidence": {}
         }
       ]
     },
@@ -1060,10 +1492,10 @@
       "address": "0xH15700150000000000000000000000000000",
       "market_id": 100021,
       "coin_address": "0xH000000000000000000000000000000000000015",
-      "blacklist_timestamp": 1775406538,
+      "blacklist_timestamp": 1775423793,
       "blacklist_price_micro_usd": 208,
       "seed_probability_bps": 7767,
-      "expiry": 1776011338,
+      "expiry": 1776028593,
       "yes_pool": 1920699000,
       "no_pool": 532301000,
       "yes_odds_bps": 7830,
@@ -1074,13 +1506,13 @@
       "symbol": "PUMPGOAT",
       "chain": "solana",
       "trace": {
-        "hash": "66ec05a04343ef71aec9e37a3a9e23b756e04d2dbe57d4ae90e37c0be599e2fb",
-        "uri": "irys://rugged-historical/66ec05a04343ef71aec9e37a3a9e23b756e04d2dbe57d4ae90e37c0be599e2fb",
-        "registered_at": 1775406542
+        "hash": "0d425f2021dc94452bf269ca83df365bad7c22f5da4a60c2fc03871518801ae6",
+        "uri": "irys://rugged-historical/0d425f2021dc94452bf269ca83df365bad7c22f5da4a60c2fc03871518801ae6",
+        "registered_at": 1775423797
       },
       "historical": true,
       "source_score": 437,
-      "resolved_timestamp": 1776011338,
+      "resolved_timestamp": 1776028593,
       "resolution_price_micro_usd": 12,
       "drop_pct": -94.2,
       "outcome": "yes",
@@ -1090,19 +1522,40 @@
           "agent": "contract_analyzer",
           "score": 0.83,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.7,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.8,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -1110,10 +1563,10 @@
       "address": "0xH15700160000000000000000000000000000",
       "market_id": 100022,
       "coin_address": "0xH000000000000000000000000000000000000016",
-      "blacklist_timestamp": 1775233738,
+      "blacklist_timestamp": 1775250993,
       "blacklist_price_micro_usd": 118,
       "seed_probability_bps": 7233,
-      "expiry": 1775838538,
+      "expiry": 1775855793,
       "yes_pool": 2932241000,
       "no_pool": 890759000,
       "yes_odds_bps": 7670,
@@ -1124,13 +1577,13 @@
       "symbol": "WAGMICAT",
       "chain": "solana",
       "trace": {
-        "hash": "6fd73b5470c20025ba5f38395c655082a9c83896d5dd48cfed1a24b2ba58039e",
-        "uri": "irys://rugged-historical/6fd73b5470c20025ba5f38395c655082a9c83896d5dd48cfed1a24b2ba58039e",
-        "registered_at": 1775233742
+        "hash": "7beb64a5028f4902e4f904fe6084277cf867d03aefcef6bdc4e6ade90997422e",
+        "uri": "irys://rugged-historical/7beb64a5028f4902e4f904fe6084277cf867d03aefcef6bdc4e6ade90997422e",
+        "registered_at": 1775250997
       },
       "historical": true,
       "source_score": 384,
-      "resolved_timestamp": 1775838538,
+      "resolved_timestamp": 1775855793,
       "resolution_price_micro_usd": 6,
       "drop_pct": -94.9,
       "outcome": "yes",
@@ -1140,19 +1593,39 @@
           "agent": "contract_analyzer",
           "score": 0.78,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.65,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.74,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -1160,10 +1633,10 @@
       "address": "0xH15700170000000000000000000000000000",
       "market_id": 100023,
       "coin_address": "0xH000000000000000000000000000000000000017",
-      "blacklist_timestamp": 1775060938,
+      "blacklist_timestamp": 1775078193,
       "blacklist_price_micro_usd": 63,
       "seed_probability_bps": 6900,
-      "expiry": 1775665738,
+      "expiry": 1775682993,
       "yes_pool": 3043897000,
       "no_pool": 977103000,
       "yes_odds_bps": 7570,
@@ -1174,13 +1647,13 @@
       "symbol": "SOLDOGE99",
       "chain": "solana",
       "trace": {
-        "hash": "6895d30bc4ffd7d43def72c9d175398a4434576555b42eb30ed27a26e16a285f",
-        "uri": "irys://rugged-historical/6895d30bc4ffd7d43def72c9d175398a4434576555b42eb30ed27a26e16a285f",
-        "registered_at": 1775060942
+        "hash": "41a290cab88585e482922b7433c13fe4d3fd2deacf82bddedf03d8c6a31c3650",
+        "uri": "irys://rugged-historical/41a290cab88585e482922b7433c13fe4d3fd2deacf82bddedf03d8c6a31c3650",
+        "registered_at": 1775078197
       },
       "historical": true,
       "source_score": 359,
-      "resolved_timestamp": 1775665738,
+      "resolved_timestamp": 1775682993,
       "resolution_price_micro_usd": 4,
       "drop_pct": -93.7,
       "outcome": "yes",
@@ -1190,19 +1663,39 @@
           "agent": "contract_analyzer",
           "score": 0.74,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.62,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.71,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -1210,10 +1703,10 @@
       "address": "0xH15700180000000000000000000000000000",
       "market_id": 100024,
       "coin_address": "0xH000000000000000000000000000000000000018",
-      "blacklist_timestamp": 1774801738,
+      "blacklist_timestamp": 1774818993,
       "blacklist_price_micro_usd": 349,
       "seed_probability_bps": 7867,
-      "expiry": 1775406538,
+      "expiry": 1775423793,
       "yes_pool": 1737060000,
       "no_pool": 472940000,
       "yes_odds_bps": 7860,
@@ -1224,13 +1717,13 @@
       "symbol": "MEGAPEPE",
       "chain": "solana",
       "trace": {
-        "hash": "e6a7cab9bec1b3fcb4bdc5bc62644bfaec1dbfb3c0e1f0055e1140c97e8923a4",
-        "uri": "irys://rugged-historical/e6a7cab9bec1b3fcb4bdc5bc62644bfaec1dbfb3c0e1f0055e1140c97e8923a4",
-        "registered_at": 1774801742
+        "hash": "9948f98e99cd32f071528bf42314c405fbe104795751743ad722670238980f56",
+        "uri": "irys://rugged-historical/9948f98e99cd32f071528bf42314c405fbe104795751743ad722670238980f56",
+        "registered_at": 1774818997
       },
       "historical": true,
       "source_score": 421,
-      "resolved_timestamp": 1775406538,
+      "resolved_timestamp": 1775423793,
       "resolution_price_micro_usd": 17,
       "drop_pct": -95.1,
       "outcome": "yes",
@@ -1240,19 +1733,40 @@
           "agent": "contract_analyzer",
           "score": 0.83,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.73,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.8,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -1260,10 +1774,10 @@
       "address": "0xH15700190000000000000000000000000000",
       "market_id": 100025,
       "coin_address": "0xH000000000000000000000000000000000000019",
-      "blacklist_timestamp": 1774542538,
+      "blacklist_timestamp": 1774559793,
       "blacklist_price_micro_usd": 94,
       "seed_probability_bps": 6433,
-      "expiry": 1775147338,
+      "expiry": 1775164593,
       "yes_pool": 2069998000,
       "no_pool": 716002000,
       "yes_odds_bps": 7430,
@@ -1274,13 +1788,13 @@
       "symbol": "BASEFROG",
       "chain": "solana",
       "trace": {
-        "hash": "08c240cf41e660aed8a9b7869787680b6e4d633b5cc62aff1ccae1bb8aa3a892",
-        "uri": "irys://rugged-historical/08c240cf41e660aed8a9b7869787680b6e4d633b5cc62aff1ccae1bb8aa3a892",
-        "registered_at": 1774542542
+        "hash": "c16779fe42f7fbfa65f2a643e0896924bec4707683d526f5c7a19f4a1ae68c63",
+        "uri": "irys://rugged-historical/c16779fe42f7fbfa65f2a643e0896924bec4707683d526f5c7a19f4a1ae68c63",
+        "registered_at": 1774559797
       },
       "historical": true,
       "source_score": 311,
-      "resolved_timestamp": 1775147338,
+      "resolved_timestamp": 1775164593,
       "resolution_price_micro_usd": 7,
       "drop_pct": -92.6,
       "outcome": "yes",
@@ -1290,19 +1804,39 @@
           "agent": "contract_analyzer",
           "score": 0.69,
           "confidence": 0.9,
-          "summary": "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
+          "key_signals": [
+            "Mint authority renounced (verified on-chain)",
+            "LP locked for <30 days \u2014 short runway",
+            "Ownership retained but no malicious functions detected",
+            "Honeypot scan clean"
+          ],
+          "reasoning": "Contract is partially defanged \u2014 mint is renounced, no honeypot patterns \u2014 but the short LP lock and retained ownership leave the dev with a near-term exit. Not a rug-on-arrival, but the structural protections expire fast.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.58,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.66,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -1310,10 +1844,10 @@
       "address": "0xH157001a0000000000000000000000000000",
       "market_id": 100026,
       "coin_address": "0xH00000000000000000000000000000000000001a",
-      "blacklist_timestamp": 1774369738,
+      "blacklist_timestamp": 1774386993,
       "blacklist_price_micro_usd": 510,
       "seed_probability_bps": 4967,
-      "expiry": 1774974538,
+      "expiry": 1774991793,
       "yes_pool": 909664000,
       "no_pool": 1694336000,
       "yes_odds_bps": 3493,
@@ -1324,13 +1858,13 @@
       "symbol": "MOONSTONE",
       "chain": "solana",
       "trace": {
-        "hash": "af0e6cae4b637f3b45e01eb0da31da4c46183c54ffa12d19f57daa8bab3a16e2",
-        "uri": "irys://rugged-historical/af0e6cae4b637f3b45e01eb0da31da4c46183c54ffa12d19f57daa8bab3a16e2",
-        "registered_at": 1774369742
+        "hash": "0b8f75fac80bbe0a7f0563b4f91a171b4e5e99e48f534235d6564f90350d2d2c",
+        "uri": "irys://rugged-historical/0b8f75fac80bbe0a7f0563b4f91a171b4e5e99e48f534235d6564f90350d2d2c",
+        "registered_at": 1774386997
       },
       "historical": true,
       "source_score": 274,
-      "resolved_timestamp": 1774974538,
+      "resolved_timestamp": 1774991793,
       "resolution_price_micro_usd": 420,
       "drop_pct": -17.6,
       "outcome": "no",
@@ -1340,19 +1874,40 @@
           "agent": "contract_analyzer",
           "score": 0.51,
           "confidence": 0.9,
-          "summary": "Mint renounced; ownership burned; LP locked > 90 days; clean honeypot scan."
+          "key_signals": [
+            "Mint authority renounced",
+            "Ownership burned to zero address",
+            "LP locked >90 days via Streamflow",
+            "Honeypot heuristics clean across 6 simulated swaps"
+          ],
+          "reasoning": "Contract is structurally clean: mint and ownership are both irrevocable, the LP is locked well past any plausible exit window, and the honeypot simulator found no asymmetric transfer logic. Low rug surface area from the contract side.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.44,
           "confidence": 0.85,
-          "summary": "Organic sentiment; dev active in 3 community channels."
+          "key_signals": [
+            "Organic sentiment across X and Telegram",
+            "Dev active in 3 community channels in last 24h",
+            "No detectable account coordination",
+            "Sentiment-to-price correlation within healthy band"
+          ],
+          "reasoning": "Social profile is consistent with an organic community: active dev presence, no synchronized promotional accounts, sentiment moving in line with price. Nothing anomalous from the social-signal side.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.54,
           "confidence": 0.92,
-          "summary": "LP stable; dev wallets dormant; holder distribution gini < 0.45."
+          "key_signals": [
+            "LP depth stable for >72h",
+            "Dev wallets dormant",
+            "Top-holder gini coefficient <0.45 (healthy)",
+            "No abnormal CEX deposit flow"
+          ],
+          "reasoning": "On-chain flow is benign: LP depth has been stable through several days, dev wallets are dormant, and holder distribution is well-spread. No precursors to a coordinated dump.",
+          "evidence": {}
         }
       ]
     },
@@ -1360,10 +1915,10 @@
       "address": "0xH157001b0000000000000000000000000000",
       "market_id": 100027,
       "coin_address": "0xH00000000000000000000000000000000000001b",
-      "blacklist_timestamp": 1774110538,
+      "blacklist_timestamp": 1774127793,
       "blacklist_price_micro_usd": 131,
       "seed_probability_bps": 7400,
-      "expiry": 1774715338,
+      "expiry": 1774732593,
       "yes_pool": 3176780000,
       "no_pool": 938220000,
       "yes_odds_bps": 7720,
@@ -1374,13 +1929,13 @@
       "symbol": "OMNIROCKET",
       "chain": "solana",
       "trace": {
-        "hash": "550b0383495debfe73bceb0a15aa7e21a30040300e4e18ac1c36d0c51a867cad",
-        "uri": "irys://rugged-historical/550b0383495debfe73bceb0a15aa7e21a30040300e4e18ac1c36d0c51a867cad",
-        "registered_at": 1774110542
+        "hash": "1ea2a24aca69bbbdc4418695be66b7c201a2ccc1a3182756c6593d385d8dded4",
+        "uri": "irys://rugged-historical/1ea2a24aca69bbbdc4418695be66b7c201a2ccc1a3182756c6593d385d8dded4",
+        "registered_at": 1774127797
       },
       "historical": true,
       "source_score": 393,
-      "resolved_timestamp": 1774715338,
+      "resolved_timestamp": 1774732593,
       "resolution_price_micro_usd": 8,
       "drop_pct": -93.9,
       "outcome": "yes",
@@ -1390,19 +1945,39 @@
           "agent": "contract_analyzer",
           "score": 0.8,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.67,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.75,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     },
@@ -1410,10 +1985,10 @@
       "address": "0xH157001c0000000000000000000000000000",
       "market_id": 100028,
       "coin_address": "0xH00000000000000000000000000000000000001c",
-      "blacklist_timestamp": 1773851338,
+      "blacklist_timestamp": 1773868593,
       "blacklist_price_micro_usd": 420,
       "seed_probability_bps": 7200,
-      "expiry": 1774456138,
+      "expiry": 1774473393,
       "yes_pool": 1417866000,
       "no_pool": 433134000,
       "yes_odds_bps": 7660,
@@ -1424,13 +1999,13 @@
       "symbol": "ETHKILLER",
       "chain": "solana",
       "trace": {
-        "hash": "ca06f880692154016576b35acb788e99c4b95219ee1556d1ab42c27a189e80fc",
-        "uri": "irys://rugged-historical/ca06f880692154016576b35acb788e99c4b95219ee1556d1ab42c27a189e80fc",
-        "registered_at": 1773851342
+        "hash": "028d69dee57434aa63bdd3bf04c79826be7195cf52fe45005df6b176ba37b0cc",
+        "uri": "irys://rugged-historical/028d69dee57434aa63bdd3bf04c79826be7195cf52fe45005df6b176ba37b0cc",
+        "registered_at": 1773868597
       },
       "historical": true,
       "source_score": 358,
-      "resolved_timestamp": 1774456138,
+      "resolved_timestamp": 1774473393,
       "resolution_price_micro_usd": 23,
       "drop_pct": -94.5,
       "outcome": "yes",
@@ -1440,19 +2015,39 @@
           "agent": "contract_analyzer",
           "score": 0.77,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.66,
           "confidence": 0.85,
-          "summary": "Moderate engagement decay; dev replies dropped 70% in last 48h."
+          "key_signals": [
+            "Dev reply rate dropped ~70% over last 48h",
+            "Engagement decay outpacing price action",
+            "Some coordinated boosting visible but not synchronized"
+          ],
+          "reasoning": "Engagement is decaying faster than the price suggests it should, and the dev has noticeably pulled back from community channels. Not a clean rug signal but enough deterioration to warrant elevated risk.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.73,
           "confidence": 0.92,
-          "summary": "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
+          "key_signals": [
+            "LP shrinking ~3% per hour",
+            "One dev-tagged wallet rotated to a fresh address",
+            "Top-5 holders concentrate 61% of float",
+            "Modest but persistent CEX deposit pressure"
+          ],
+          "reasoning": "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev wallet rotated which could be either prep or routine, and holder concentration is high enough that one whale move would move price hard.",
+          "evidence": {}
         }
       ]
     },
@@ -1460,10 +2055,10 @@
       "address": "0xH157001d0000000000000000000000000000",
       "market_id": 100029,
       "coin_address": "0xH00000000000000000000000000000000000001d",
-      "blacklist_timestamp": 1773592138,
+      "blacklist_timestamp": 1773609393,
       "blacklist_price_micro_usd": 175,
       "seed_probability_bps": 7667,
-      "expiry": 1774196938,
+      "expiry": 1774214193,
       "yes_pool": 2576340000,
       "no_pool": 726660000,
       "yes_odds_bps": 7800,
@@ -1474,13 +2069,13 @@
       "symbol": "CRYPTOPUP",
       "chain": "solana",
       "trace": {
-        "hash": "213247517114e2efd22fe5b92aaa325ebd5516da174a826bb8833b40972cc9b9",
-        "uri": "irys://rugged-historical/213247517114e2efd22fe5b92aaa325ebd5516da174a826bb8833b40972cc9b9",
-        "registered_at": 1773592142
+        "hash": "0426dc11bcee695f457f198a2cced3a384444d788a77d694fdbe6a3a60330c41",
+        "uri": "irys://rugged-historical/0426dc11bcee695f457f198a2cced3a384444d788a77d694fdbe6a3a60330c41",
+        "registered_at": 1773609397
       },
       "historical": true,
       "source_score": 401,
-      "resolved_timestamp": 1774196938,
+      "resolved_timestamp": 1774214193,
       "resolution_price_micro_usd": 10,
       "drop_pct": -94.3,
       "outcome": "yes",
@@ -1490,19 +2085,40 @@
           "agent": "contract_analyzer",
           "score": 0.81,
           "confidence": 0.9,
-          "summary": "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders \u2265 78%."
+          "key_signals": [
+            "Mint authority NOT renounced \u2014 dev can mint at will",
+            "Ownership retained on the LP pair contract",
+            "Top-10 holders concentrate 78% of supply",
+            "Honeypot heuristic: sell tax 18%, buy tax 4%"
+          ],
+          "reasoning": "Contract retains every escape hatch a maliciously-aligned dev needs: unrenounced mint, retained LP ownership, asymmetric transfer taxes that trap buyers. The holder concentration alone would suffice; combined with the mint authority, this is a textbook setup for a coordinated dump.",
+          "evidence": {}
         },
         {
           "agent": "social_signal_analyzer",
           "score": 0.71,
           "confidence": 0.85,
-          "summary": "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+          "key_signals": [
+            "Coordinated shilling: 6 accounts posted within a 4h window",
+            "Dev wallet went silent within hours of peak price",
+            "Telegram member count dropped 22% post-peak",
+            "Top reply guys all created accounts <30 days ago"
+          ],
+          "reasoning": "The social pattern is a classic pump-distribute fingerprint: synchronized promotional accounts created in the last month, dev going dark right as the price peaks, and an unusually fast community attrition once the chart bends. These three together are the strongest social predictor of a coming dump.",
+          "evidence": {}
         },
         {
           "agent": "onchain_flow_analyzer",
           "score": 0.78,
           "confidence": 0.92,
-          "summary": "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+          "key_signals": [
+            "LP removed 42% in last 6h",
+            "Dev wallet drained 1.2 SOL to a fresh address",
+            "Top holder offloaded 18% of position",
+            "Net flow into CEX deposit addresses spiking"
+          ],
+          "reasoning": "On-chain flow is the loudest signal of the three: LP is being unwound at a rate that, extrapolated, drains the pool inside 24h. The dev movement to a fresh address combined with a top-holder dump is the exact sequence we'd expect immediately before a finishing-leg sell.",
+          "evidence": {}
         }
       ]
     }

@@ -135,24 +135,35 @@ def _build_market(
 
     trace_hash_hex = _trace_hash(symbol, mint, blacklist_ts)
 
+    # Match agents._shared.AgentVerdict shape exactly so the frontend can
+    # render live + historical traces from the same component.
+    contract_signals, contract_reasoning = _contract_verdict(a_contract)
+    social_signals, social_reasoning = _social_verdict(a_social)
+    flow_signals, flow_reasoning = _flow_verdict(a_flow)
     verdicts = [
         {
             "agent": "contract_analyzer",
             "score": round(a_contract, 3),
             "confidence": 0.90,
-            "summary": _contract_summary(a_contract),
+            "key_signals": contract_signals,
+            "reasoning": contract_reasoning,
+            "evidence": {},
         },
         {
             "agent": "social_signal_analyzer",
             "score": round(a_social, 3),
             "confidence": 0.85,
-            "summary": _social_summary(a_social),
+            "key_signals": social_signals,
+            "reasoning": social_reasoning,
+            "evidence": {},
         },
         {
             "agent": "onchain_flow_analyzer",
             "score": round(a_flow, 3),
             "confidence": 0.92,
-            "summary": _flow_summary(a_flow),
+            "key_signals": flow_signals,
+            "reasoning": flow_reasoning,
+            "evidence": {},
         },
     ]
 
@@ -192,28 +203,120 @@ def _build_market(
     }
 
 
-def _contract_summary(score: float) -> str:
+def _contract_verdict(score: float) -> tuple[list[str], str]:
     if score >= 0.75:
-        return "Mint authority NOT renounced; ownership retained; LP unlocked. Top-10 holders ≥ 78%."
+        return (
+            [
+                "Mint authority NOT renounced — dev can mint at will",
+                "Ownership retained on the LP pair contract",
+                "Top-10 holders concentrate 78% of supply",
+                "Honeypot heuristic: sell tax 18%, buy tax 4%",
+            ],
+            "Contract retains every escape hatch a maliciously-aligned dev needs: "
+            "unrenounced mint, retained LP ownership, asymmetric transfer taxes that "
+            "trap buyers. The holder concentration alone would suffice; combined with "
+            "the mint authority, this is a textbook setup for a coordinated dump.",
+        )
     if score >= 0.55:
-        return "Mint renounced but ownership retained; LP locked < 30 days. Honeypot patterns absent."
-    return "Mint renounced; ownership burned; LP locked > 90 days; clean honeypot scan."
+        return (
+            [
+                "Mint authority renounced (verified on-chain)",
+                "LP locked for <30 days — short runway",
+                "Ownership retained but no malicious functions detected",
+                "Honeypot scan clean",
+            ],
+            "Contract is partially defanged — mint is renounced, no honeypot patterns — "
+            "but the short LP lock and retained ownership leave the dev with a near-term "
+            "exit. Not a rug-on-arrival, but the structural protections expire fast.",
+        )
+    return (
+        [
+            "Mint authority renounced",
+            "Ownership burned to zero address",
+            "LP locked >90 days via Streamflow",
+            "Honeypot heuristics clean across 6 simulated swaps",
+        ],
+        "Contract is structurally clean: mint and ownership are both irrevocable, the "
+        "LP is locked well past any plausible exit window, and the honeypot simulator "
+        "found no asymmetric transfer logic. Low rug surface area from the contract side.",
+    )
 
 
-def _social_summary(score: float) -> str:
+def _social_verdict(score: float) -> tuple[list[str], str]:
     if score >= 0.7:
-        return "Coordinated shilling across 6 accounts < 24h before peak. Dev wallet silent post-peak."
+        return (
+            [
+                "Coordinated shilling: 6 accounts posted within a 4h window",
+                "Dev wallet went silent within hours of peak price",
+                "Telegram member count dropped 22% post-peak",
+                "Top reply guys all created accounts <30 days ago",
+            ],
+            "The social pattern is a classic pump-distribute fingerprint: synchronized "
+            "promotional accounts created in the last month, dev going dark right as the "
+            "price peaks, and an unusually fast community attrition once the chart bends. "
+            "These three together are the strongest social predictor of a coming dump.",
+        )
     if score >= 0.5:
-        return "Moderate engagement decay; dev replies dropped 70% in last 48h."
-    return "Organic sentiment; dev active in 3 community channels."
+        return (
+            [
+                "Dev reply rate dropped ~70% over last 48h",
+                "Engagement decay outpacing price action",
+                "Some coordinated boosting visible but not synchronized",
+            ],
+            "Engagement is decaying faster than the price suggests it should, and the dev "
+            "has noticeably pulled back from community channels. Not a clean rug signal "
+            "but enough deterioration to warrant elevated risk.",
+        )
+    return (
+        [
+            "Organic sentiment across X and Telegram",
+            "Dev active in 3 community channels in last 24h",
+            "No detectable account coordination",
+            "Sentiment-to-price correlation within healthy band",
+        ],
+        "Social profile is consistent with an organic community: active dev presence, no "
+        "synchronized promotional accounts, sentiment moving in line with price. Nothing "
+        "anomalous from the social-signal side.",
+    )
 
 
-def _flow_summary(score: float) -> str:
+def _flow_verdict(score: float) -> tuple[list[str], str]:
     if score >= 0.75:
-        return "LP removed 42% in last 6h; dev wallet drained 1.2 SOL to fresh address; top holder dumped 18%."
+        return (
+            [
+                "LP removed 42% in last 6h",
+                "Dev wallet drained 1.2 SOL to a fresh address",
+                "Top holder offloaded 18% of position",
+                "Net flow into CEX deposit addresses spiking",
+            ],
+            "On-chain flow is the loudest signal of the three: LP is being unwound at a "
+            "rate that, extrapolated, drains the pool inside 24h. The dev movement to a "
+            "fresh address combined with a top-holder dump is the exact sequence we'd "
+            "expect immediately before a finishing-leg sell.",
+        )
     if score >= 0.55:
-        return "LP shrinking ~3%/h; one dev-tagged wallet rotated; top-5 holders concentrated 61%."
-    return "LP stable; dev wallets dormant; holder distribution gini < 0.45."
+        return (
+            [
+                "LP shrinking ~3% per hour",
+                "One dev-tagged wallet rotated to a fresh address",
+                "Top-5 holders concentrate 61% of float",
+                "Modest but persistent CEX deposit pressure",
+            ],
+            "Flow is leaning bearish but not panicked: LP is bleeding slowly, one dev "
+            "wallet rotated which could be either prep or routine, and holder "
+            "concentration is high enough that one whale move would move price hard.",
+        )
+    return (
+        [
+            "LP depth stable for >72h",
+            "Dev wallets dormant",
+            "Top-holder gini coefficient <0.45 (healthy)",
+            "No abnormal CEX deposit flow",
+        ],
+        "On-chain flow is benign: LP depth has been stable through several days, dev "
+        "wallets are dormant, and holder distribution is well-spread. No precursors "
+        "to a coordinated dump.",
+    )
 
 
 def seed(*, force: bool = False, seed_value: int = 4242) -> dict[str, Any]:
