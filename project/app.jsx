@@ -52,15 +52,15 @@ const STACK = [
 ];
 
 const COMMITS = [
-  { h: "8e2f4a1", a: "iterativv", m: "blacklist: add PEPELON 0x4f…a912", t: "06:14:32" },
-  { h: "3c9b22d", a: "iterativv", m: "blacklist: add WAGMI42 0x09…11ab", t: "06:11:09" },
-  { h: "5dd91e0", a: "iterativv", m: "blacklist: add MONA 0xb1…7c3e",   t: "05:58:44" },
-  { h: "11a4cc8", a: "iterativv", m: "blacklist: remove SAFEAI (rescind)", t: "05:42:01" },
-  { h: "7e3220a", a: "iterativv", m: "blacklist: add TRUTH404 9aH…kQ2", t: "05:30:55" },
-  { h: "0bf6c1c", a: "iterativv", m: "blacklist: add DEGENPUP 0xfa…d010", t: "05:21:18" },
-  { h: "a401fcb", a: "iterativv", m: "blacklist: add AIDOG 0x77…22fe", t: "04:58:02" },
-  { h: "62b8e0e", a: "iterativv", m: "blacklist: add GROK10 0x12…99ee", t: "04:41:39" },
-  { h: "9be4d72", a: "iterativv", m: "blacklist: add SHIBA404 0x88…0a01", t: "04:22:11" },
+  { h: "8e2f4a1", a: "rugcheck", m: "flag: PEPELON 0x4f…a912", t: "06:14:32" },
+  { h: "3c9b22d", a: "rugcheck", m: "flag: WAGMI42 0x09…11ab", t: "06:11:09" },
+  { h: "5dd91e0", a: "rugcheck", m: "flag: MONA 0xb1…7c3e",   t: "05:58:44" },
+  { h: "11a4cc8", a: "rugcheck", m: "clear: SAFEAI (false positive)", t: "05:42:01" },
+  { h: "7e3220a", a: "rugcheck", m: "flag: TRUTH404 9aH…kQ2", t: "05:30:55" },
+  { h: "0bf6c1c", a: "rugcheck", m: "flag: DEGENPUP 0xfa…d010", t: "05:21:18" },
+  { h: "a401fcb", a: "rugcheck", m: "flag: AIDOG 0x77…22fe", t: "04:58:02" },
+  { h: "62b8e0e", a: "rugcheck", m: "flag: GROK10 0x12…99ee", t: "04:41:39" },
+  { h: "9be4d72", a: "rugcheck", m: "flag: SHIBA404 0x88…0a01", t: "04:22:11" },
 ];
 
 /* ----------------------------------------------------------------
@@ -117,7 +117,7 @@ function Boot({ done }) {
   const [step, setStep] = useState(0);
   const [prog, setProg] = useState(0);
   const lines = [
-    { l: "watcher.connect → github.com/iterativv/NostalgiaForInfinity", s: "ok" },
+    { l: "watcher.connect → rugcheck.xyz", s: "ok" },
     { l: "agent.solidity.warm → claude-4 · contract analyzer", s: "ok" },
     { l: "agent.whisper.warm → claude-4 · social signal", s: "ok" },
     { l: "agent.flow.warm → claude-4 · onchain flow", s: "ok" },
@@ -175,7 +175,7 @@ function RailLeft() {
 
   return (
     <div className="rail-inner">
-      <h6>Commit feed · iterativv/NFI</h6>
+      <h6>Risk feed · rugcheck.xyz</h6>
       <div className="ticker">
         {feed.map((c, i) => (
           <div key={i} className="row">
@@ -278,7 +278,7 @@ function Hero() {
             a coin <span className="ember">dies</span>.
           </h3>
           <p className="lede mt-32">
-            Rugged turns iterativv's blacklist commit log into<br />
+            Rugged turns RugCheck's risk-scoring feed into<br />
             an on-chain prediction market. Three agents verify.<br />
             Markets open <span style={{ color: "var(--ink)", fontWeight: 500 }}>in the same block</span> the rug is named.
           </p>
@@ -298,9 +298,9 @@ function Hero() {
         </div>
         <div className="hero-side">
           <div className="stat-row">
-            <div className="stat"><div className="v">87<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}>%</span></div><div className="k">iterativv hit-rate · 30d</div></div>
+            <div className="stat"><div className="v">87<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}>%</span></div><div className="k">RugCheck hit-rate · 30d</div></div>
             <div className="stat"><div className="v">312<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}> ms</span></div><div className="k">commit → market</div></div>
-            <div className="stat"><div className="v">$48k</div><div className="k">bonded on iterativv</div></div>
+            <div className="stat"><div className="v">$48k</div><div className="k">bonded on RugCheck</div></div>
             <div className="stat"><div className="v">7<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}>/d</span></div><div className="k">circle primitives</div></div>
           </div>
         </div>
@@ -331,8 +331,8 @@ function Nutshell() {
   const items = [
     {
       n: "01",
-      ttl: "iterativv names it",
-      body: "A maintainer pushes a blacklist commit on GitHub the moment a rug is suspected. The signal is public, free, and currently uncapitalized.",
+      ttl: "RugCheck flags it",
+      body: "RugCheck's scanner flags a Solana token the moment a rug pattern fires. The signal is public, free, and currently uncapitalized.",
       visual: <CommitVisual />,
     },
     {
@@ -376,7 +376,7 @@ function Nutshell() {
 function CommitVisual() {
   return (
     <div className="commit-vis">
-      <div><span className="hash">8e2f4a1</span> · iterativv · 06:14:32</div>
+      <div><span className="hash">8e2f4a1</span> · rugcheck · 06:14:32</div>
       <div>{"  blacklist.json"}</div>
       <div className="rem">- // last edit 4h ago</div>
       <div className="add">+ "0x4fa912…": "PEPELON",</div>
@@ -549,9 +549,9 @@ function Bond() {
     <section className="s" data-name="bond" id="bond">
       <div className="section-head">
         <div className="eyebrow">Slash bond</div>
-        <h2 className="section-title">Stake on<br />her reputation,<br />not her vibe.</h2>
+        <h2 className="section-title">Stake on<br />their record,<br />not their vibe.</h2>
       </div>
-      <p className="lede" style={{ marginBottom: 32 }}>Users stake USDC alongside iterativv's blacklist record. The contract tracks her hit-rate over the last 30 resolved markets. Below 70%, bonds slash proportionally and redistribute to remaining holders. A human maintainer's reputation, priced on-chain.</p>
+      <p className="lede" style={{ marginBottom: 32 }}>Users stake USDC alongside RugCheck's risk-scoring record. The contract tracks their hit-rate over the last 30 resolved markets. Below 70%, bonds slash proportionally and redistribute to remaining holders. An analytics firm's reputation, priced on-chain.</p>
       <div className="card bond-card">
         <div className="gauge-wrap">
           <svg viewBox="0 0 200 200" className="gauge">
@@ -575,7 +575,7 @@ function Bond() {
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
           </span>
           <span className="btn-xl-fx__text">
-            <span className="btn-xl-fx__label">Bond on iterativv</span>
+            <span className="btn-xl-fx__label">Bond on RugCheck</span>
           </span>
           <span className="arrow" aria-hidden>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>

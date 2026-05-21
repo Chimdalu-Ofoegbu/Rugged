@@ -95,7 +95,7 @@ function BondPage() {
       label: "Hit-rate ≥ 85%",
       delta: `+$${bullDelta}`,
       sub: "30d · USYC yield + redistribution",
-      detail: "She holds the line. Idle bet capital earns 5.1% APR via USYC; you also receive a pro-rata share of any forfeited bonds.",
+      detail: "They hold the line. Idle bet capital earns 5.1% APR via USYC; you also receive a pro-rata share of any forfeited bonds.",
     },
     {
       tag: "base",
@@ -124,20 +124,20 @@ function BondPage() {
 
       <section className="bond-hero">
         <h1 className="bond-hero-title">
-          Stake on her <span className="ember">record</span>,<br />not her vibe.
+          Stake on their <span className="ember">record</span>,<br />not their vibe.
         </h1>
         <p className="bond-hero-lede">
-          A human maintainer's hit-rate, priced on-chain. The contract reads her last 30 resolved<br />
-          markets every block — and slashes proportionally when she misses below the floor.
+          RugCheck's risk-scoring hit-rate, priced on-chain. The contract reads their last 30 resolved<br />
+          markets every block — and slashes proportionally when they miss below the floor.
         </p>
 
         <div className="bond-identity">
-          <div className="b-avatar">iv</div>
+          <div className="b-avatar">rc</div>
           <div className="b-meta">
-            <div className="b-handle">@iterativv</div>
-            <div className="b-sub">github.com/iterativv/NostalgiaForInfinity · 4,219 commits · maintainer since 2019</div>
+            <div className="b-handle">@rugcheck</div>
+            <div className="b-sub">rugcheck.xyz · real-time Solana risk scoring · since 2024</div>
           </div>
-          <a href="#" className="b-external" aria-label="open github">
+          <a href="#" className="b-external" aria-label="open rugcheck.xyz">
             <svg width="13" height="13" viewBox="0 0 13 13"><path d="M4 4h5v5M9 4L4 9" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </a>
         </div>
@@ -165,8 +165,8 @@ function BondPage() {
             </div>
             <div className="stake-head-text">
               <div className="eyebrow"><span>Your bond</span></div>
-              <div className="stake-headline">Back her, or sit it out.</div>
-              <div className="stake-subhead">Stake USDC. Slash exposure recomputes block-by-block from her 30-market window.</div>
+              <div className="stake-headline">Back them, or sit it out.</div>
+              <div className="stake-subhead">Stake USDC. Slash exposure recomputes block-by-block from their 30-market window.</div>
             </div>
           </div>
 
@@ -223,7 +223,7 @@ function BondPage() {
               </div>
 
               <button className="stake-confirm" onClick={() => setConfirmed(true)}>
-                Bond ${stake.toLocaleString()} on iterativv
+                Bond ${stake.toLocaleString()} on RugCheck
               </button>
               <div className="gas-note">paymaster covers gas · 30-block cooldown to unbond · slash floor 70%</div>
             </>
@@ -279,7 +279,7 @@ function BondPage() {
           <h2 className="resolved-title">
             {hits} <span className="ember">hits</span><span className="resolved-mid"> · </span>{misses} <span style={{ color: "var(--ink-3)" }}>misses</span>
           </h2>
-          <p className="resolved-lede">Every market she's named in the last 30 days. Ember is a hit — coin dropped &gt;50% within 7 days. Dim is a miss.</p>
+          <p className="resolved-lede">Every market they've flagged in the last 30 days. Ember is a hit — coin dropped &gt;50% within 7 days. Dim is a miss.</p>
         </div>
         <div className="resolved-grid">
           {RESOLVED.map((r, i) => (
@@ -309,7 +309,7 @@ function BondConfirmed({ amount, rate, onReset }) {
         <svg width="22" height="22" viewBox="0 0 20 20"><path d="M5 10l3 3 7-7" stroke="currentColor" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </div>
       <div className="ttl">Bond locked.</div>
-      <div className="conf-sub">${amount.toLocaleString()} bonded on iterativv · hit-rate {Math.round(rate)}%</div>
+      <div className="conf-sub">${amount.toLocaleString()} bonded on RugCheck · hit-rate {Math.round(rate)}%</div>
       <div className="conf-hash">tx {txHash} · block {block.toLocaleString()}</div>
       <button className="another" onClick={onReset}>add to position</button>
     </div>
