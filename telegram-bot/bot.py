@@ -40,7 +40,7 @@ load_dotenv(ROOT / ".env", override=True)
 
 try:
     from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-    from telegram.constants import ParseMode
+    from telegram.constants import ChatAction, ParseMode
     from telegram.ext import (
         Application,
         CommandHandler,
@@ -235,16 +235,33 @@ async def cmd_stop(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(msg)
 
 
-async def cmd_markets(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+async def _placeholder(update: Update, ctx: ContextTypes.DEFAULT_TYPE, text: str):
+    """Send an instant ack + typing indicator while a slow API call runs.
+
+    Returns the placeholder Message so the caller can `.edit_text(...)`
+    once real data is available. This decouples user-visible latency
+    from the cold-cache /api/markets enrichment time (~16s).
+    """
+    try:
+        await ctx.bot.send_chat_action(
+            chat_id=update.effective_chat.id, action=ChatAction.TYPING,
+        )
+    except Exception:  # noqa: BLE001 — typing is decorative
+        pass
+    return await update.message.reply_text(text)
+
+
+async def cmd_markets(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    msg = await _placeholder(update, ctx, "🔍 Pulling live markets from Arc…")
     try:
         markets = await api.markets()
     except Exception as exc:  # noqa: BLE001
-        await update.message.reply_text(f"⚠️ API unreachable: {exc}")
+        await msg.edit_text(f"⚠️ API unreachable: {type(exc).__name__}: {exc}")
         return
 
     open_markets = [m for m in markets if not m.get("resolved")]
     if not open_markets:
-        await update.message.reply_text("No open markets right now — the swarm is quiet.")
+        await msg.edit_text("No open markets right now — the swarm is quiet.")
         return
 
     # Sort by seed probability — hottest first; cap at 5.
@@ -259,22 +276,23 @@ async def cmd_markets(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
             f"ttl {_ttl(m.get('expiry'))}\n"
             f"  [open]({_market_link(m.get('market_id', 0), symbol)})"
         )
-    await update.message.reply_text(
+    await msg.edit_text(
         "\n".join(lines),
         parse_mode=ParseMode.MARKDOWN,
         disable_web_page_preview=True,
     )
 
 
-async def cmd_mybets(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+async def cmd_mybets(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    msg = await _placeholder(update, ctx, "🔍 Reading your Circle wallet…")
     try:
         wallet = await api.demo_wallet()
     except Exception as exc:  # noqa: BLE001
-        await update.message.reply_text(f"⚠️ API unreachable: {exc}")
+        await msg.edit_text(f"⚠️ API unreachable: {type(exc).__name__}: {exc}")
         return
 
     if not wallet.get("exists"):
-        await update.message.reply_text(
+        await msg.edit_text(
             "No demo wallet yet — open the app once to provision one via Circle:"
             f"\n{WEB_BASE}",
             disable_web_page_preview=True,
@@ -284,7 +302,7 @@ async def cmd_mybets(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     bal = wallet.get("balance") or {}
     usdc = bal.get("usdc_micro", 0) / 1_000_000
     usyc = bal.get("usyc_micro", 0) / 1_000_000
-    await update.message.reply_text(
+    await msg.edit_text(
         "*Your demo position*\n"
         f"Wallet `{_fmt_mint(wallet.get('address'))}`\n"
         f"USDC: ${usdc:,.2f}\n"
@@ -295,11 +313,12 @@ async def cmd_mybets(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-async def cmd_bond(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+async def cmd_bond(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
+    msg = await _placeholder(update, ctx, "🔍 Checking RugCheck bond status…")
     try:
         stats = await api.stats()
     except Exception as exc:  # noqa: BLE001
-        await update.message.reply_text(f"⚠️ API unreachable: {exc}")
+        await msg.edit_text(f"⚠️ API unreachable: {type(exc).__name__}: {exc}")
         return
 
     hit_rate_pct = stats.get("hit_rate_pct")
@@ -310,7 +329,7 @@ async def cmd_bond(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     slash_threshold = 70.0
     status = "✅ HEALTHY" if hit_rate_pct >= slash_threshold else "⚠️ SLASHING"
     margin = hit_rate_pct - slash_threshold
-    await update.message.reply_text(
+    await msg.edit_text(
         "*RugCheck reputation bond*\n"
         f"Hit rate (30d rolling): *{hit_rate_pct:.1f}%* over {resolved} resolved markets\n"
         f"Slash threshold: {slash_threshold:.0f}%\n"
