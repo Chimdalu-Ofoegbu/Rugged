@@ -63,14 +63,16 @@ async function boot() {
           // which silences the "configured chains are not supported by
           // Coinbase Smart Wallet" startup warnings — Arc isn't in
           // Coinbase Smart Wallet's chain list and we don't need it.
+          // Only embedded-wallet flows. "wallet" is intentionally absent —
+          // Privy still ships Coinbase SDK in the bundle (and its init logs
+          // are filtered at the top of this file), but no UI affordance lets
+          // a user pick it.
           loginMethods: ["email", "google"],
           appearance: {
             theme: "dark",
             accentColor: "#ee5a3a",
             showWalletLoginFirst: false,
-            walletList: [],
           },
-          externalWallets: { coinbaseWallet: { connectionOptions: "eoaOnly" } },
           embeddedWallets: { ethereum: { createOnLogin: "all-users" } },
           defaultChain: arcTestnet,
           supportedChains: [arcTestnet],
