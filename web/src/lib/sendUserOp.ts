@@ -1,30 +1,28 @@
 // sendUserOp — the gas-free transaction primitive.
 //
-// Pipeline (matches what viem v2 / permissionless v0.2 expect):
+// Avoids viem's high-level `client.prepareUserOperation` because that
+// invokes the bundlerTransport for eth_estimateUserOperationGas, which
+// would hit a non-existent local Skandha. We do everything manually
+// against the public Arc client + our own backend instead:
 //
-//   1. client.prepareUserOperation({ calls }) — viem walks gas estimation,
-//      factory/factoryData, AND invokes our paymaster.getPaymasterData hook
-//      (configured in smartAccount.ts). The returned op already has paymaster,
-//      paymasterData, paymasterVerificationGasLimit, paymasterPostOpGasLimit
-//      set, in viem's UNPACKED v0.7 shape.
-//
-//   2. client.account.signUserOperation(prepared) — the SimpleAccount packs
-//      the op internally, asks EntryPoint.getUserOpHash, signs with EIP-191
-//      via Privy's embedded EOA, and returns the signature hex.
-//
-//   3. toPackedUserOperation({ ...prepared, signature }) — convert to the
-//      on-chain v0.7 PackedUserOperation shape (initCode, accountGasLimits,
-//      gasFees, paymasterAndData all collapsed into bytes).
-//
-//   4. POST the packed op to /api/bundler/submit. The backend self-bundler
-//      calls EntryPoint.handleOps from the funded deployer key and returns
-//      the on-chain tx hash + UserOp receipt.
+//   1. Get nonce + factoryArgs from the SmartAccount.
+//   2. Build callData via SimpleAccount.execute(target, value, data).
+//   3. Hardcode conservative gas limits (paymaster pays — no incentive
+//      to be precise).
+//   4. POST the (still-unsigned) packed UserOp to /api/paymaster/sponsor.
+//      Backend signs the sponsorship, returns paymasterAndData.
+//   5. Unpack the blob into viem's UserOperation fields.
+//   6. account.signUserOperation(...) — Privy iframe signs the EIP-191
+//      hash internally.
+//   7. POST the fully-signed PackedUserOperation to /api/bundler/submit.
+//      Backend self-bundler relays it through EntryPoint.handleOps.
 
 import type { SmartAccountClient } from "permissionless";
 import { encodeFunctionData, type Hex } from "viem";
 import { toPackedUserOperation, type UserOperation } from "viem/account-abstraction";
 
-import { API_BASE } from "../config";
+import { API_BASE, ARC_CHAIN_ID } from "../config";
+import { publicClient } from "./viemClient";
 
 export type SendUserOpResult = {
   userOpHash: Hex;
@@ -38,8 +36,6 @@ export type SendUserOpResult = {
 };
 
 /// Build calldata for a SimpleAccount.execute(target, value, data) call.
-/// Exported because some callers (e.g. tests, manual flows) want to compose
-/// the inner call before handing it to sendUserOp.
 export function executeCall(target: `0x${string}`, value: bigint, data: Hex): Hex {
   return encodeFunctionData({
     abi: [{
@@ -58,61 +54,148 @@ export function executeCall(target: `0x${string}`, value: bigint, data: Hex): He
   });
 }
 
-/// Build, sponsor (via the client's getPaymasterData hook), sign, and submit
-/// a UserOperation. Throws on any step — the error message names the failure.
+/// Split the on-chain paymasterAndData blob into viem's v0.7 unpacked fields.
+/// Mirrors smartAccount.ts's getPaymasterData hook layout.
+///   [0:20]    paymaster address
+///   [20:36]   validationGasLimit (uint128) || postOpGasLimit (uint128)
+///   [36:]     paymasterData (timestamps + signature)
+function unpackPaymasterAndData(blob: Hex) {
+  const raw = blob.startsWith("0x") ? blob.slice(2) : blob;
+  const paymaster = ("0x" + raw.slice(0, 40)) as `0x${string}`;
+  const verifGasHex = "0x" + raw.slice(40, 72);
+  const postOpGasHex = "0x" + raw.slice(72, 104);
+  const paymasterData = ("0x" + raw.slice(104)) as `0x${string}`;
+  return {
+    paymaster,
+    paymasterVerificationGasLimit: BigInt(verifGasHex),
+    paymasterPostOpGasLimit: BigInt(postOpGasHex),
+    paymasterData,
+  };
+}
+
+function toHex(n: bigint): Hex {
+  return ("0x" + n.toString(16)) as Hex;
+}
+
+/// Build, sponsor, sign, and submit a UserOperation manually.
 export async function sendUserOp(
   client: SmartAccountClient,
   call: { target: `0x${string}`; data: Hex; value?: bigint },
 ): Promise<SendUserOpResult> {
   if (!client.account) throw new Error("smart account not initialized");
-
-  // Steps 1+2: viem's high-level helpers. `prepareUserOperation` is on the
-  // client and fills factory/gas/fees + invokes our paymaster.getPaymasterData
-  // hook. `signUserOperation` lives on the account.
-  const prepared = (await (client as unknown as {
-    prepareUserOperation: (args: {
-      calls: Array<{ to: `0x${string}`; value: bigint; data: Hex }>;
-    }) => Promise<Record<string, unknown>>;
-  }).prepareUserOperation({
-    calls: [{ to: call.target, value: call.value ?? 0n, data: call.data }],
-  })) as Record<string, unknown>;
-
   const account = client.account as unknown as {
-    signUserOperation: (parameters: Record<string, unknown> & { chainId?: number }) => Promise<Hex>;
+    address: `0x${string}`;
+    getNonce: () => Promise<bigint>;
+    getFactoryArgs: () => Promise<{ factory?: `0x${string}`; factoryData?: Hex }>;
+    signUserOperation: (
+      op: UserOperation & { chainId?: number },
+    ) => Promise<Hex>;
   };
-  const signature = await account.signUserOperation(prepared);
 
-  // Step 3: pack for the on-chain ABI shape our backend bundler expects.
-  // Viem's toPackedUserOperation handles the field concatenation rules
-  // (factory||factoryData, verifGasLimit||callGasLimit, fees, paymaster blob).
-  // We assert the UserOperation shape — the type-narrowing through
-  // prepareUserOperation's generic chain is more cost than it's worth here.
-  const finalOp = { ...prepared, signature } as unknown as UserOperation;
-  const packed = toPackedUserOperation(finalOp);
+  const sender = account.address;
 
-  // Step 4: POST to the self-bundler and wait for the EntryPoint receipt.
-  const res = await fetch(`${API_BASE}/bundler/submit`, {
+  // 1. Nonce + factory (latter only set if the account isn't deployed yet).
+  const [nonce, factoryArgs] = await Promise.all([
+    account.getNonce(),
+    account.getFactoryArgs(),
+  ]);
+
+  // 2. Inner call.
+  const callData = executeCall(call.target, call.value ?? 0n, call.data);
+
+  // 3. Gas — generous fixed values. Paymaster covers the cost so over-
+  // estimation just means a little extra wei sits in EntryPoint, refunded
+  // on postOp. Bigger verificationGasLimit on first op to cover deployment.
+  const isFirstOp = !!factoryArgs.factory;
+  const verificationGasLimit = isFirstOp ? 800_000n : 200_000n;
+  const callGasLimit = 250_000n;
+  const preVerificationGas = 70_000n;
+  const gasPrice = await publicClient.getGasPrice();
+  const maxPriorityFeePerGas = gasPrice > 1_000_000_000n ? gasPrice : 1_000_000_000n;
+  const maxFeePerGas = maxPriorityFeePerGas * 2n;
+
+  // 4. Assemble the unsigned op (no paymaster fields yet, no signature).
+  const unsigned: UserOperation = {
+    sender,
+    nonce,
+    factory: factoryArgs.factory,
+    factoryData: factoryArgs.factoryData,
+    callData,
+    callGasLimit,
+    verificationGasLimit,
+    preVerificationGas,
+    maxFeePerGas,
+    maxPriorityFeePerGas,
+    signature: "0x" as Hex,
+  } as unknown as UserOperation;
+
+  // 5. POST to /api/paymaster/sponsor with the packed shape the backend
+  //    verifies. Backend signs over the same bytes the on-chain paymaster
+  //    will check; the blob it returns we splice back into the unpacked op.
+  const packedNoPayMaster = toPackedUserOperation(unsigned);
+  const sponsorRes = await fetch(`${API_BASE}/paymaster/sponsor`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       userOp: {
-        sender: packed.sender,
-        nonce: `0x${packed.nonce.toString(16)}`,
-        initCode: packed.initCode,
-        callData: packed.callData,
-        accountGasLimits: packed.accountGasLimits,
-        preVerificationGas: `0x${packed.preVerificationGas.toString(16)}`,
-        gasFees: packed.gasFees,
-        paymasterAndData: packed.paymasterAndData,
-        signature: packed.signature,
+        sender: packedNoPayMaster.sender,
+        nonce: toHex(packedNoPayMaster.nonce),
+        initCode: packedNoPayMaster.initCode,
+        callData: packedNoPayMaster.callData,
+        accountGasLimits: packedNoPayMaster.accountGasLimits,
+        preVerificationGas: toHex(packedNoPayMaster.preVerificationGas),
+        gasFees: packedNoPayMaster.gasFees,
+        paymasterAndData: "0x",
+        signature: "0x",
+      },
+      wallet: sender,
+      chainId: ARC_CHAIN_ID,
+    }),
+  });
+  if (!sponsorRes.ok) {
+    const err = (await sponsorRes.json().catch(() => ({}))) as Record<string, string>;
+    throw new Error(err.error ?? err.detail ?? `Paymaster refused (HTTP ${sponsorRes.status})`);
+  }
+  const sponsorBody = (await sponsorRes.json()) as { paymasterAndData: Hex };
+  const pmFields = unpackPaymasterAndData(sponsorBody.paymasterAndData);
+
+  // 6. Splice paymaster fields back, then sign.
+  const sponsored: UserOperation = {
+    ...unsigned,
+    ...pmFields,
+  } as UserOperation;
+  const signature = await account.signUserOperation({
+    ...sponsored,
+    chainId: ARC_CHAIN_ID,
+  });
+
+  // 7. Pack the fully-signed op + POST to /api/bundler/submit.
+  const finalPacked = toPackedUserOperation({
+    ...sponsored,
+    signature,
+  } as UserOperation);
+  const submitRes = await fetch(`${API_BASE}/bundler/submit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userOp: {
+        sender: finalPacked.sender,
+        nonce: toHex(finalPacked.nonce),
+        initCode: finalPacked.initCode,
+        callData: finalPacked.callData,
+        accountGasLimits: finalPacked.accountGasLimits,
+        preVerificationGas: toHex(finalPacked.preVerificationGas),
+        gasFees: finalPacked.gasFees,
+        paymasterAndData: finalPacked.paymasterAndData,
+        signature: finalPacked.signature,
       },
     }),
   });
-  if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as Record<string, string>;
-    throw new Error(body.error ?? body.detail ?? `Bundler refused (HTTP ${res.status})`);
+  if (!submitRes.ok) {
+    const err = (await submitRes.json().catch(() => ({}))) as Record<string, string>;
+    throw new Error(err.error ?? err.detail ?? `Bundler refused (HTTP ${submitRes.status})`);
   }
-  const body = (await res.json()) as {
+  const body = (await submitRes.json()) as {
     userOpHash: string;
     txHash: string;
     blockNumber: number;

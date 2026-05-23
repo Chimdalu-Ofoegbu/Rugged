@@ -17,11 +17,12 @@ import { PrivyProvider } from "@privy-io/react-auth";
 // Suppress the Coinbase Smart Wallet "configured chains are not supported"
 // console.info. Privy auto-loads @coinbase/wallet-sdk because it's part of
 // their default connector bundle; the SDK then logs that warning at init
-// because Arc (5042002) isn't on its supported-chains list. There's no
-// official way to keep the SDK out of the bundle without forking Privy, and
-// the message is purely informational — we never expose Coinbase Smart
-// Wallet to users (loginMethods is just email + google). Filter it before
-// it ever reaches the console.
+// because Arc (5042002) isn't on its supported-chains list. The Smart Wallet
+// connector itself is disabled via externalWallets.coinbaseWallet =
+// { connectionOptions: "eoaOnly" } below (users picking "Coinbase Wallet"
+// from the wallet picker get the EOA extension/mobile flow, which DOES
+// support arbitrary chains). The startup log fires before that config is
+// consulted, so we still filter it here.
 const _origInfo = console.info;
 console.info = (...args: unknown[]) => {
   const first = args[0];
@@ -58,22 +59,30 @@ async function boot() {
       <PrivyProvider
         appId={PRIVY_APP_ID}
         config={{
-          // Only embedded-wallet flows. Excluding "wallet" from
-          // loginMethods skips the external wallet connectors entirely,
-          // which silences the "configured chains are not supported by
-          // Coinbase Smart Wallet" startup warnings — Arc isn't in
-          // Coinbase Smart Wallet's chain list and we don't need it.
-          // Only embedded-wallet flows. "wallet" is intentionally absent —
-          // Privy still ships Coinbase SDK in the bundle (and its init logs
-          // are filtered at the top of this file), but no UI affordance lets
-          // a user pick it.
-          loginMethods: ["email", "google"],
+          // Two paths into Rugged:
+          //   - "email": magic-link sign-in → Privy provisions an embedded
+          //     wallet (MPC, no seed phrase). Used as the smart-account owner.
+          //   - "wallet": connect an external EOA (MetaMask, Rabby, Coinbase
+          //     Wallet extension, WalletConnect). That EOA becomes the
+          //     smart-account owner directly; no embedded wallet is created.
+          loginMethods: ["email", "wallet"],
           appearance: {
             theme: "dark",
             accentColor: "#ee5a3a",
+            // Email is the headline primary CTA; wallet sits underneath.
             showWalletLoginFirst: false,
           },
-          embeddedWallets: { ethereum: { createOnLogin: "all-users" } },
+          // Force Coinbase Wallet to "EOA only" so the picker offers the
+          // extension/mobile app (Arc-compatible) and skips Coinbase Smart
+          // Wallet (which hard-codes its own supported-chains list and would
+          // fail on Arc).
+          externalWallets: {
+            coinbaseWallet: { connectionOptions: "eoaOnly" },
+          },
+          // Only provision an embedded wallet for users who didn't bring
+          // their own. External-wallet users use their connected EOA as
+          // the smart-account owner — no second wallet needed.
+          embeddedWallets: { ethereum: { createOnLogin: "users-without-wallets" } },
           defaultChain: arcTestnet,
           supportedChains: [arcTestnet],
         }}

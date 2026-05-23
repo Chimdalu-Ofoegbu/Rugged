@@ -382,11 +382,11 @@ function WalletModal({ open, onClose }) {
   // is derived deterministically from their EOA owner.
   const connectBtnLabel = w.loading
     ? "Connecting…"
-    : (isReturning ? "Sign back in" : "Sign in with email or Google");
+    : (isReturning ? "Sign back in" : "Sign in or connect wallet");
   const connectTitle = isReturning ? "Welcome back" : "Connect to bet";
   const connectSub = isReturning
-    ? "Sign in again with the same email — your smart-account address and balance follow you across browsers. Gas is sponsored by the Rugged Paymaster on every bet."
-    : "Sign in with email or Google. Privy provisions a smart-account wallet on Arc — no seed phrase, no extension. Gas is sponsored by the Rugged Paymaster on every bet, claim, and cancel.";
+    ? "Sign in with the same email — or reconnect the wallet you used last time. Your smart-account address and balance follow whichever signer you choose. Gas is sponsored by the Rugged Paymaster on every bet."
+    : "Sign in with email and Privy provisions a smart-account wallet on Arc — no seed phrase, no extension. Already have a wallet? Connect MetaMask, Rabby, Coinbase, or any WalletConnect signer instead. Gas is sponsored by the Rugged Paymaster on every bet, claim, and cancel.";
 
   return (
     <Portal>
@@ -526,8 +526,8 @@ function WalletModal({ open, onClose }) {
         ) : (
           <>
             <ul className="wallet-feature-list">
-              <li>Email or Google sign-in via <b>Privy</b> — no seed phrase, no extension</li>
-              <li>You own the signer key — every action signs in Privy's iframe, not on a server</li>
+              <li>Email sign-in via <b>Privy</b> — no seed phrase, no extension</li>
+              <li>Or connect your own wallet — <b>MetaMask</b>, <b>Rabby</b>, <b>Coinbase</b>, or <b>WalletConnect</b></li>
               <li>Gas sponsored by the <b>Rugged Paymaster</b> — bets, claims, cancels all $0.00</li>
               <li>Settlement on <b>Arc</b> · sub-second finality · USDC end-to-end</li>
             </ul>

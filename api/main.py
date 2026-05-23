@@ -77,18 +77,47 @@ def _mint_registry() -> dict[str, dict[str, Any]]:
 #  Cached chain reads — markets list refreshes every 10s
 # ----------------------------------------------------------------------
 _markets_cache: dict[str, Any] = {"at": 0.0, "data": []}
-# Cache TTL — longer than the bot's 20s alert poll so /api/markets stays
-# continuously warm. Bet placements & new markets show up within one cycle.
-_CACHE_TTL = 30.0
+# Cache TTL — Arc testnet RPC is rate-limited at the swarm endpoint and
+# starts returning 503s under load, so we hold the cache much longer than
+# the original 30s. Bet placements / new markets show up on the next
+# manual refresh or when an admin endpoint invalidates the cache.
+_CACHE_TTL = 300.0  # 5 minutes
+
+
+def _invalidate_markets_cache() -> None:
+    """Force the next `/api/markets` call to re-read from chain."""
+    _markets_cache["at"] = 0.0
+    _markets_cache["data"] = []
+# Concurrency cap for chain reads — too high triggers Arc's swarm rate
+# limit (HTTP 503). Two parallel reads is the sweet spot: still 3-4× faster
+# than serial, well below the 503 threshold.
+_CHAIN_FANOUT = 2
+
+
+def _with_retry(fn, *args, retries: int = 3, backoff: float = 0.6, **kwargs):
+    """Retry helper for chain reads. Arc testnet's swarm RPC occasionally
+    503s under load; a few short backoffs almost always recover."""
+    last_exc: Exception | None = None
+    for attempt in range(retries):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            msg = str(exc).lower()
+            transient = "503" in msg or "service" in msg or "timeout" in msg or "temporarily" in msg
+            if not transient:
+                raise
+            time.sleep(backoff * (2 ** attempt))
+    raise last_exc if last_exc else RuntimeError("retry exhausted")
 
 
 def _enrich(market_id: int) -> dict[str, Any] | None:
     """Pull a single market's full picture: on-chain state + trace."""
     factory = _factory_contract()
-    addr = factory.functions.getMarket(market_id).call()
+    addr = _with_retry(lambda: factory.functions.getMarket(market_id).call())
     if int(addr, 16) == 0:
         return None
-    state = read_market(addr)
+    state = _with_retry(read_market, addr)
     derived = state["coin_address"].lower()
     mint_meta = _mint_registry().get(derived, {})
 
@@ -134,7 +163,13 @@ def _historical_markets() -> list[dict[str, Any]]:
 
 @app.get("/api/markets")
 def list_markets() -> dict[str, Any]:
-    """Returns all markets — live on-chain first, then the historical seed."""
+    """Returns all markets — live on-chain first, then the historical seed.
+
+    Live enrichment is parallelized via a thread pool: Arc's RPC is ~9s per
+    `read_market` call, so a serial loop over N markets blows past the
+    client's HTTP timeout. ThreadPoolExecutor turns that into a single 9s
+    cold fill regardless of N (up to the pool size).
+    """
     now = time.time()
     historical = _historical_markets()
     if now - _markets_cache["at"] < _CACHE_TTL and _markets_cache["data"]:
@@ -148,11 +183,14 @@ def list_markets() -> dict[str, Any]:
 
     factory = _factory_contract()
     count = factory.functions.marketCount().call()
-    markets: list[dict[str, Any]] = []
-    for i in range(count):
-        enriched = _enrich(i)
-        if enriched:
-            markets.append(enriched)
+
+    from concurrent.futures import ThreadPoolExecutor
+    # Pool size > expected market count so every market reads concurrently.
+    with ThreadPoolExecutor(max_workers=_CHAIN_FANOUT) as pool:
+        results = list(pool.map(_enrich, range(count)))
+    markets = [m for m in results if m is not None]
+    # Preserve newest-first ordering for the UI (matches market_id).
+    markets.sort(key=lambda m: m.get("market_id", 0), reverse=True)
 
     _markets_cache["at"] = now
     _markets_cache["data"] = markets
@@ -254,11 +292,21 @@ def stats() -> dict[str, Any]:
     open_markets = 0
     live_rugs = 0
     live_resolved = 0
-    for i in range(count):
+
+    def _read_one(i: int) -> dict[str, Any] | None:
         addr = factory.functions.getMarket(i).call()
         if int(addr, 16) == 0:
+            return None
+        return read_market(addr)
+
+    # Parallel: Arc RPC is ~9s per call; serial would blow past the client
+    # timeout once we have more than a handful of markets.
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=_CHAIN_FANOUT) as pool:
+        results = list(pool.map(_read_one, range(count)))
+    for s in results:
+        if s is None:
             continue
-        s = read_market(addr)
         total_yes += s["yes_pool"]
         total_no += s["no_pool"]
         if s["resolved"]:
@@ -661,29 +709,41 @@ def wallet_positions_route(
     from chain.market import read_market, read_wallet_position
     factory = _factory_contract()
     count = factory.functions.marketCount().call()
-
-    positions: list[dict[str, Any]] = []
     mints = _mint_registry()
-    for market_id in range(count):
+    wallet_addr = wallet["address"]
+
+    def _read_position(market_id: int):
+        """Read addr + position + market state for a single market in one shot.
+
+        Returns (market_id, market_addr, pos, mstate) or None to skip.
+        Runs in a worker thread — Arc RPC is per-call slow."""
         market_addr = factory.functions.getMarket(market_id).call()
         if int(market_addr, 16) == 0:
-            continue
+            return None
         try:
-            pos = read_wallet_position(market_addr, wallet["address"])
+            pos = read_wallet_position(market_addr, wallet_addr)
         except Exception as exc:  # noqa: BLE001
             log.warning("position read failed for market %d: %s", market_id, exc)
-            continue
+            return None
         if not pos["has_position"]:
-            continue
-
-        # Enrich with the bits the UI needs to render a row without a
-        # second round-trip per market.
+            return None
         try:
             mstate = read_market(market_addr)
         except Exception as exc:  # noqa: BLE001
             log.warning("market read failed for %d: %s", market_id, exc)
             mstate = {}
+        return (market_id, market_addr, pos, mstate)
 
+    # Parallelize across all markets — Arc RPC is ~9s/call serially.
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=_CHAIN_FANOUT) as pool:
+        results = list(pool.map(_read_position, range(count)))
+
+    positions: list[dict[str, Any]] = []
+    for entry in results:
+        if entry is None:
+            continue
+        market_id, market_addr, pos, mstate = entry
         derived = (mstate.get("coin_address") or "").lower()
         mint_meta = mints.get(derived, {})
 
@@ -766,6 +826,7 @@ def admin_demo_market(payload: dict[str, Any] | None = None) -> dict[str, Any]:
         log.exception("demo-market create failed: %s", exc)
         raise HTTPException(status_code=502, detail=str(exc))
 
+    _invalidate_markets_cache()
     return {
         "symbol": symbol,
         "mint": mint,
@@ -826,6 +887,7 @@ def admin_force_resolve(
         log.exception("force-resolve failed: %s", exc)
         raise HTTPException(status_code=502, detail=str(exc))
 
+    _invalidate_markets_cache()
     return {
         "market_id": market_id,
         "market_address": market_addr,
@@ -834,6 +896,13 @@ def admin_force_resolve(
         "blacklist_price_micro_usd": int(state["blacklist_price_micro_usd"]),
         **result,
     }
+
+
+@app.post("/api/admin/clear-markets-cache")
+def admin_clear_markets_cache() -> dict[str, Any]:
+    """Drop the in-memory /api/markets cache. Next call re-reads from chain."""
+    _invalidate_markets_cache()
+    return {"cleared": True}
 
 
 @app.post("/api/admin/resolver-tick")

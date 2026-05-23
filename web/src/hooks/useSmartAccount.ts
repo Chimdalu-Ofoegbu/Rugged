@@ -1,7 +1,12 @@
 // React hook that returns a memoized SmartAccountClient for the current
-// Privy embedded wallet. Returns null while Privy is still initializing
-// or when no embedded wallet exists yet (e.g. user signed in via Google
-// but Privy hasn't finished provisioning the wallet).
+// signer wallet. The signer is either:
+//   - the Privy embedded wallet (email login → MPC EOA), or
+//   - the first connected external wallet (MetaMask, Rabby, Coinbase Wallet
+//     extension, WalletConnect, etc.).
+// Embedded wins when both are present — the email-first user shouldn't have
+// their smart-account address shift if they later link an external wallet.
+// Returns null while Privy is still initializing or before any wallet is
+// available.
 
 import { useEffect, useState } from "react";
 import { useWallets } from "@privy-io/react-auth";
@@ -21,16 +26,17 @@ export function useSmartAccount(): SmartAccountState {
   const { wallets } = useWallets();
   const [state, setState] = useState<SmartAccountState>(IDLE);
 
-  const embeddedWallet = wallets.find((w) => w.walletClientType === "privy");
+  const signerWallet =
+    wallets.find((w) => w.walletClientType === "privy") ?? wallets[0];
 
   useEffect(() => {
     let cancelled = false;
-    if (!embeddedWallet) {
+    if (!signerWallet) {
       setState(IDLE);
       return;
     }
     setState({ status: "loading", client: null, address: null, error: null });
-    makeSmartAccountClient(embeddedWallet)
+    makeSmartAccountClient(signerWallet)
       .then(async (client) => {
         if (cancelled) return;
         // permissionless.SmartAccountClient exposes account.getAddress()
@@ -51,7 +57,7 @@ export function useSmartAccount(): SmartAccountState {
         });
       });
     return () => { cancelled = true; };
-  }, [embeddedWallet?.address]);
+  }, [signerWallet?.address]);
 
   return state;
 }

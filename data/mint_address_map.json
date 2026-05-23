@@ -4,5 +4,65 @@
     "symbol": "DEMO0189",
     "chain": "solana",
     "added_at": 1779500189
+  },
+  "0x2f62fbe508525516d07c2045d349af498bce6b18": {
+    "mint": "GvqtmT9PGc9YMJihNZ18agCA5eLdnHybRDK78c7Hzh1C",
+    "symbol": "DEMO0376",
+    "chain": "solana",
+    "added_at": 1779530376
+  },
+  "0x18812c8b8c0c1c165638e1d21b6187190b1c829a": {
+    "mint": "8g7hSLbbm8TaYBzJjU7G3VwuZwzo6tDe65gMYun29hEw",
+    "symbol": "DEMO0396",
+    "chain": "solana",
+    "added_at": 1779530396
+  },
+  "0xe23cdc4f3b14b84b7478fa958a17adf6e4c81b5d": {
+    "mint": "Mfcwv8aN62U2NY8vfe1hQmJz286CovmCzucSc7et9BR",
+    "symbol": "DEMO0876",
+    "chain": "solana",
+    "added_at": 1779540876
+  },
+  "0x9f7fcb10df2394702af9d25ea8ca80a7340fe785": {
+    "mint": "8p4X2Zy8E1Ut34s4LCQNsnmEVzQ8G5U2scokXKiGYzkA",
+    "symbol": "DEMO0878",
+    "chain": "solana",
+    "added_at": 1779540878
+  },
+  "0x120334db320a594e95ef835f77cdcf222820a18d": {
+    "mint": "BUnoq6bKFFXwBv2yPm7rzUPaAfcvWDXvn2vK9a9KZkU2",
+    "symbol": "DEMO6015",
+    "chain": "solana",
+    "added_at": 1779566015
+  },
+  "0xa1c71a50654ba078471efed70dcd4e535f55fefa": {
+    "mint": "HZfAe33bNwasM3Rkx2qa4Ex3jUFy6tYYJ56DBHuf1UPN",
+    "symbol": "DEMO6018",
+    "chain": "solana",
+    "added_at": 1779566018
+  },
+  "0x058318a1a4a90cba4fafff0062d8fcb34dadef8f": {
+    "mint": "52mtRrDSSiLpFtCdPHGepoG3z5beuwi7FJxXgFf2gvVD",
+    "symbol": "PEPELON",
+    "chain": "solana",
+    "added_at": 1779569767
+  },
+  "0xb40b4a1a886afe55c5fbbd77bd0f899eca7ea5b1": {
+    "mint": "5B83tbEu2WFvCZDhxYrRMktG7vPEKfPcbyr3eh8A2xvZ",
+    "symbol": "AIDOGE99",
+    "chain": "solana",
+    "added_at": 1779569772
+  },
+  "0xd1ffadcae2acb26d7a07bba6e9457843bfd95432": {
+    "mint": "EwZHbjab9nGitLAp6y3WmX4S4TFqwhtrR9vUT8kx4nd8",
+    "symbol": "MOONLAMBO",
+    "chain": "solana",
+    "added_at": 1779569776
+  },
+  "0x7c44d5844f03f39a4f4522864a119ef2eb3f8dba": {
+    "mint": "99ugmbuBcV8HMycM5tj87wQLeAcki3CCG8doh7d3HEJM",
+    "symbol": "DEGENPUP",
+    "chain": "solana",
+    "added_at": 1779569781
   }
 }

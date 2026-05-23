@@ -18,7 +18,23 @@
     {
       "name": "api: rugged (FastAPI + project)",
       "runtimeExecutable": "uv",
-      "runtimeArgs": ["run", "uvicorn", "api.main:app", "--host", "127.0.0.1", "--port", "8001", "--reload"],
+      "runtimeArgs": ["run", "uvicorn", "api.main:app", "--host", "127.0.0.1", "--port", "8001"],
+      "port": 8001,
+      "autoPort": true
+    },
+    {
+      "name": "api: rugged (dev with --reload)",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": [
+        "run", "uvicorn", "api.main:app", "--host", "127.0.0.1", "--port", "8001",
+        "--reload",
+        "--reload-dir", "api",
+        "--reload-dir", "chain",
+        "--reload-dir", "agents",
+        "--reload-dir", "resolver",
+        "--reload-dir", "watcher",
+        "--reload-dir", "traces"
+      ],
       "port": 8001,
       "autoPort": true
     },

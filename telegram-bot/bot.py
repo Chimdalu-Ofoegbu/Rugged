@@ -15,8 +15,8 @@ Run:
 
 Env (see .env.example):
     TELEGRAM_BOT_TOKEN     — required, from @BotFather
-    RUGGED_API_BASE        — default http://127.0.0.1:8000
-    RUGGED_WEB_BASE        — default http://127.0.0.1:8000 (one-tap bet link host)
+    RUGGED_API_BASE        — default http://127.0.0.1:8001
+    RUGGED_WEB_BASE        — default http://127.0.0.1:5173 (one-tap bet link host)
     TELEGRAM_POLL_SECONDS  — default 20 (new-market alert poll interval)
 """
 
@@ -58,8 +58,8 @@ log = logging.getLogger("telegram-bot")
 # ----------------------------------------------------------------------
 #  Config
 # ----------------------------------------------------------------------
-API_BASE = os.environ.get("RUGGED_API_BASE", "http://127.0.0.1:8000").rstrip("/")
-WEB_BASE = os.environ.get("RUGGED_WEB_BASE", "http://127.0.0.1:8000").rstrip("/")
+API_BASE = os.environ.get("RUGGED_API_BASE", "http://127.0.0.1:8001").rstrip("/")
+WEB_BASE = os.environ.get("RUGGED_WEB_BASE", "http://127.0.0.1:5173").rstrip("/")
 POLL_SECONDS = int(os.environ.get("TELEGRAM_POLL_SECONDS", "20"))
 SUBSCRIBERS_PATH = ROOT / "data" / "telegram_subscribers.json"
 ALERTED_PATH = ROOT / "data" / "telegram_alerted_markets.json"
