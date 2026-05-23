@@ -39,3 +39,13 @@ rugged-pitch.html
 data/telegram_subscribers.json
 data/telegram_alerted_markets.json
 data/demo_wallet.json
+# Per-user wallet records (testnet addresses, but still session state)
+data/wallets/
+# Faucet rate-limit ledgers
+data/faucet_ledger.json
+data/faucet_ip_ledger.json
+# Resolver daemon per-market price-tracking state
+data/price_tracking/
+
+# Foundry / Anvil lock file
+contracts/foundry.lock

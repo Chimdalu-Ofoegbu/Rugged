@@ -138,8 +138,11 @@ class RuggedAPI:
     async def stats(self) -> dict[str, Any]:
         return await self._get("/api/stats")
 
-    async def demo_wallet(self) -> dict[str, Any]:
-        return await self._get("/api/demo-wallet")
+    # NOTE: the old single-shared `/api/demo-wallet` endpoint was removed
+    # when the wallet system became per-user (X-Rugged-User-Id, then Privy
+    # smart accounts). Telegram users don't have a stable web identity here,
+    # so /mybets now just deep-links them to the web app where their wallet
+    # lives. Method intentionally absent.
 
 
 api = RuggedAPI()
@@ -284,32 +287,17 @@ async def cmd_markets(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def cmd_mybets(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
-    msg = await _placeholder(update, ctx, "🔍 Reading your Circle wallet…")
-    try:
-        wallet = await api.demo_wallet()
-    except Exception as exc:  # noqa: BLE001
-        await msg.edit_text(f"⚠️ API unreachable: {type(exc).__name__}: {exc}")
-        return
-
-    if not wallet.get("exists"):
-        await msg.edit_text(
-            "No demo wallet yet — open the app once to provision one via Circle:"
-            f"\n{WEB_BASE}",
-            disable_web_page_preview=True,
-        )
-        return
-
-    bal = wallet.get("balance") or {}
-    usdc = bal.get("usdc_micro", 0) / 1_000_000
-    usyc = bal.get("usyc_micro", 0) / 1_000_000
-    await msg.edit_text(
-        "*Your demo position*\n"
-        f"Wallet `{_fmt_mint(wallet.get('address'))}`\n"
-        f"USDC: ${usdc:,.2f}\n"
-        f"USYC (yield-bearing): ${usyc:,.2f}\n"
-        "\n"
-        "_(Per-market bet history surfaces here once event-log indexing ships.)_",
+    # Wallets are per-user in the web app (Privy email/Google login → smart
+    # account). The Telegram bot has no link to a user's web session, so we
+    # deep-link them to the My Bets tab in the wallet modal.
+    await update.message.reply_text(
+        "*Your bets live in the web app*\n\n"
+        "Open Rugged and sign in with the same email each time — your "
+        "smart-account follows you across browsers.\n\n"
+        f"{WEB_BASE}\n"
+        "Then: click the wallet pill → *My bets* tab.",
         parse_mode=ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
     )
 
 

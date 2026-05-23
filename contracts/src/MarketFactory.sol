@@ -26,6 +26,12 @@ contract MarketFactory is Ownable {
     /// @notice marketId => Market contract address.
     mapping(uint256 => address) public markets;
 
+    /// @notice Reverse lookup — was this address created by this factory?
+    /// @dev    Used by RuggedPaymaster's on-chain scope check to verify that
+    ///         a UserOperation's target is a real Rugged Market (not a
+    ///         malicious lookalike) before sponsoring gas.
+    mapping(address => bool) public isMarket;
+
     event MarketOpened(
         uint256 indexed marketId,
         address indexed market,
@@ -51,18 +57,20 @@ contract MarketFactory is Ownable {
         reputationBond = _reputationBond;
     }
 
-    /// @notice Deploy a new 24-hour market. Called by the backend operator
+    /// @notice Deploy a new prediction market. Called by the backend operator
     ///         (owner) once the swarm fires consensus.
     /// @param  coinAddress         the blacklisted coin
     /// @param  blacklistTimestamp  unix time of the blacklist commit
     /// @param  blacklistPrice      coin price at blacklist time (resolution baseline)
     /// @param  seedProbabilityBps  swarm consensus probability, in basis points
+    /// @param  duration            market lifetime in seconds; 0 → 24h default
     /// @return marketId            id of the created market
     function createMarket(
         address coinAddress,
         uint256 blacklistTimestamp,
         uint256 blacklistPrice,
-        uint256 seedProbabilityBps
+        uint256 seedProbabilityBps,
+        uint256 duration
     ) external onlyOwner returns (uint256 marketId) {
         if (coinAddress == address(0)) revert ZeroAddress();
         if (blacklistPrice == 0) revert ZeroPrice();
@@ -76,12 +84,14 @@ contract MarketFactory is Ownable {
             blacklistTimestamp,
             blacklistPrice,
             seedProbabilityBps,
+            duration,
             resolution,
             treasury,
             reputationBond
         );
 
         markets[marketId] = address(market);
+        isMarket[address(market)] = true;
         marketCount = marketId + 1;
 
         emit MarketOpened(marketId, address(market), coinAddress, seedProbabilityBps, market.expiry());

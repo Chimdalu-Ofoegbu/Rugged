@@ -251,15 +251,13 @@ function HeaderNav({ route }) {
           </a>
         ))}
       </nav>
-      <a href="#/markets" className="headernav-cta">
-        <span className="hn-arrow hn-arrow-dup" aria-hidden>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6h6m0 0L6.5 3.5M9 6l-2.5 2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        </span>
-        <span className="hn-cta-text">Start with $5</span>
-        <span className="hn-arrow" aria-hidden>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6h6m0 0L6.5 3.5M9 6l-2.5 2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        </span>
-      </a>
+      {window.WalletPill
+        ? <window.WalletPill />
+        : (
+          <a href="#/markets" className="headernav-cta">
+            <span className="hn-cta-text">Connect wallet</span>
+          </a>
+        )}
     </header>
   );
 }
@@ -411,20 +409,30 @@ function MarketVisual() {
 function Markets() {
   const [tab, setTab] = useState("hot");
   const [tick, setTick] = useState(0);
+  // Live data only — no fake fallback. If the hook isn't loaded yet, treat
+  // it as a loading state.
+  const hookResult = (window.useLiveMarkets || (() => ({
+    markets: [], loading: true, error: null, source: "loading",
+  })))();
+  const { markets: dataMarkets, source, loading, error } = hookResult;
+
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(id);
   }, []);
 
+  // Only show currently-open markets in the home preview.
+  const openMarkets = dataMarkets.filter((m) => !m.resolved);
+
   const list = useMemo(() => {
-    return MARKETS.slice(0, 6).map((m, i) => ({
+    return openMarkets.slice(0, 6).map((m, i) => ({
       ...m,
       consensus: m.agents.filter((s) => s > 0.5).length + "/3",
       // gentle probability drift
       prob: Math.max(0.05, Math.min(0.97, m.prob + Math.sin((tick + i * 8) / 14) * 0.012)),
       ttl: Math.max(60, m.ttl - tick),
     }));
-  }, [tick]);
+  }, [tick, dataMarkets]);
 
   return (
     <section className="s" data-name="markets" id="markets">
@@ -450,8 +458,25 @@ function Markets() {
         ))}
       </div>
       <div className="stack gap-8 market-list">
-        {list.map((m, i) => (
-          <button key={m.tkr} className="market" style={{ textAlign: "left" }}>
+        {loading && list.length === 0 ? (
+          <div style={{ padding: 32, textAlign: "center", color: "var(--ink-3)", fontFamily: "var(--mono)", fontSize: 12, border: "1px dashed var(--line)", borderRadius: 8 }}>
+            Loading live markets from Arc…
+          </div>
+        ) : error ? (
+          <div style={{ padding: 32, textAlign: "center", color: "var(--ember)", fontFamily: "var(--mono)", fontSize: 12, border: "1px solid color-mix(in oklch, var(--ember), transparent 70%)", borderRadius: 8 }}>
+            API unreachable — {error}
+          </div>
+        ) : list.length === 0 ? (
+          <div style={{ padding: 32, textAlign: "center", color: "var(--ink-3)", fontFamily: "var(--mono)", fontSize: 12, border: "1px dashed var(--line)", borderRadius: 8 }}>
+            No open markets right now. The swarm is watching the feed — new markets open as the agents fire.
+          </div>
+        ) : list.map((m, i) => (
+          <a
+            key={m.market_id != null ? `m-${m.market_id}` : `t-${m.tkr}-${i}`}
+            href={`#/markets/${m.tkr.toLowerCase()}`}
+            className="market"
+            style={{ textAlign: "left", textDecoration: "none", color: "inherit" }}
+          >
             <div className="tkr">{m.tkr.slice(0, 4)}</div>
             <div className="stack">
               <div className="label">{m.tkr} <span style={{ color: "var(--ink-3)", fontFamily: "var(--mono)", fontSize: 10, marginLeft: 4 }}>· drops &gt;50%</span></div>
@@ -462,7 +487,7 @@ function Markets() {
               <div className="prob up">{Math.round(m.prob * 100)}%</div>
               <div className="sub" style={{ color: m.price.startsWith("-") ? "var(--ember)" : "var(--safe)" }}>{m.price}</div>
             </div>
-          </button>
+          </a>
         ))}
       </div>
       <div className="mt-48">
@@ -484,24 +509,81 @@ function Markets() {
 
 /* Swarm */
 function Swarm() {
+  const { markets: dataMarkets } = (window.useLiveMarkets || (() => ({ markets: [] })))();
+  const [liveTrace, setLiveTrace] = useState(null);
+
+  // When live markets exist, pull the most recent one's full trace.
+  useEffect(() => {
+    const live = (dataMarkets || []).filter((m) => m.live && m.market_id !== undefined);
+    if (live.length === 0) return;
+    const latest = live[live.length - 1];
+    const base = window.RUGGED_API_BASE || "/api";
+    fetch(`${base}/markets/${latest.market_id}`)
+      .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+      .then((body) => setLiveTrace({ market: body, full: body.full_trace }))
+      .catch((err) => console.warn("trace fetch failed:", err));
+  }, [dataMarkets]);
+
+  // Choose data source: real trace if available, hardcoded AGENTS otherwise.
+  const agentRows = liveTrace && liveTrace.full && liveTrace.full.verdicts
+    ? liveTrace.full.verdicts.map((v) => ({
+        role: ({
+          contract_analyzer: "Agent A · Contract",
+          social_signal_analyzer: "Agent B · Social",
+          onchain_flow_analyzer: "Agent C · Onchain",
+        })[v.agent] || v.agent,
+        name: ({
+          contract_analyzer: "Solidity",
+          social_signal_analyzer: "Whisper",
+          onchain_flow_analyzer: "Flow",
+        })[v.agent] || "Agent",
+        score: v.score,
+        confidence: v.confidence,
+        trace: (v.key_signals || []).map((s) => "• " + s).join("\n") +
+               (v.reasoning ? "\n\n" + v.reasoning : ""),
+      }))
+    : AGENTS;
+
+  const isLive = !!(liveTrace && liveTrace.full);
+  const consensusProb = isLive
+    ? liveTrace.market.seed_probability_bps / 10000
+    : 0.83;
+  const firingCount = isLive
+    ? (liveTrace.full.swarm && liveTrace.full.swarm.firing_count) || 0
+    : 3;
+  const traceHash = isLive ? liveTrace.market.trace && liveTrace.market.trace.hash : "9c2…0a1f";
+  const traceUri = isLive ? liveTrace.market.trace && liveTrace.market.trace.uri : null;
+  const marketAddr = isLive ? liveTrace.market.address : null;
+
   return (
     <section className="s" data-name="swarm" id="swarm">
       <div className="section-head">
-        <div className="eyebrow">The swarm</div>
+        <div className="eyebrow">
+          The swarm
+          {isLive && (
+            <span style={{ marginLeft: 10, padding: "2px 8px", background: "var(--ember)", color: "#0a0a0a", borderRadius: 4, fontSize: 9, letterSpacing: ".08em", fontWeight: 600 }}>
+              MARKET #{liveTrace.market.market_id} · LIVE
+            </span>
+          )}
+        </div>
         <h2 className="section-title">Three agents.<br />One verdict.<br /><span style={{ color: "var(--ember)" }}>Always logged.</span></h2>
       </div>
       <p className="lede" style={{ marginBottom: 32, whiteSpace: "nowrap" }}>
         Each agent returns a rug-likelihood score and a structured reasoning trace.<br />
         Consensus of ≥ 2 of 3 above 0.5 triggers market creation. Every trace is<br />
-        SHA-256 hashed to Arc and pinned to IPFS — a permanent audit trail.
+        SHA-256 hashed to Arc and pinned for permanent audit.
       </p>
       <div className="stack gap-12 swarm-list">
-        {AGENTS.map((a) => (
-          <div className="agent reveal" key={a.role}>
+        {agentRows.map((a, i) => (
+          <div className="agent reveal" key={a.role + i}>
             <div className="agent-head">
               <div>
                 <div className="role">{a.role}</div>
-                <div className="name">{a.name}</div>
+                <div className="name">{a.name}{isLive && a.confidence !== undefined && (
+                  <span style={{ marginLeft: 6, color: "var(--ink-3)", fontSize: 10 }}>
+                    · conf {a.confidence.toFixed(2)}
+                  </span>
+                )}</div>
               </div>
               <div className="score">{a.score.toFixed(2)}</div>
             </div>
@@ -513,16 +595,23 @@ function Swarm() {
         <div className="between">
           <div>
             <div className="eyebrow" style={{ color: "var(--ember)" }}>Consensus</div>
-            <div style={{ fontFamily: "var(--display)", fontWeight: "var(--display-weight)", fontSize: 30, lineHeight: 1, marginTop: 6, letterSpacing: "var(--display-tracking)" }}>3 of 3 · open market</div>
+            <div style={{ fontFamily: "var(--display)", fontWeight: "var(--display-weight)", fontSize: 30, lineHeight: 1, marginTop: 6, letterSpacing: "var(--display-tracking)" }}>
+              {firingCount} of 3 · {isLive ? "market open" : "open market"}
+            </div>
           </div>
-          <div className="prob up" style={{ fontSize: 40 }}>0.83</div>
+          <div className="prob up" style={{ fontSize: 40 }}>{consensusProb.toFixed(2)}</div>
         </div>
         <div className="trace mt-16" style={{ maxHeight: "none" }}>
-{`trace_hash: 0x9c2…0a1f
-ipfs_cid: bafybeic…q4i
-arc_block: 4,219,011
-gas_paid: 0.00 USDC (paymaster)`}
+{`trace_hash: ${traceHash ? (isLive ? "0x" + traceHash.slice(0, 16) + "…" + traceHash.slice(-8) : traceHash) : "—"}
+${traceUri ? `trace_uri:  ${traceUri.length > 60 ? traceUri.slice(0, 32) + "…" + traceUri.slice(-24) : traceUri}` : "ipfs_cid: bafybeic…q4i"}
+${marketAddr ? `market:     ${marketAddr}` : "arc_block: 4,219,011"}
+gas_paid:   0.00 USDC (paymaster)`}
         </div>
+        {traceUri && (
+          <a href={traceUri} target="_blank" rel="noreferrer" className="btn-ghost mt-16" style={{ display: "inline-flex", fontSize: 11 }}>
+            View full reasoning trace →
+          </a>
+        )}
       </div>
     </section>
   );
@@ -588,6 +677,17 @@ function Bond() {
 
 /* Circle stack */
 function Stack() {
+  const [usyc, setUsyc] = useState(null);
+  useEffect(() => {
+    const base = window.RUGGED_API_BASE || "/api";
+    fetch(`${base}/usyc/stats`)
+      .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+      .then(setUsyc)
+      .catch((err) => console.warn("usyc stats fetch failed:", err));
+  }, []);
+  const apy = usyc ? usyc.apy_pct.toFixed(2) : "5.12";
+  const yieldSource = usyc ? usyc.yield_source : "Hashnote · 30-day trailing";
+
   return (
     <section className="s" data-name="stack" id="stack">
       <div className="section-head">
@@ -599,13 +699,21 @@ function Stack() {
         {STACK.map((s) => (
           <div className="chip" key={s.lbl}>
             <span className="lbl">{s.lbl}</span>
-            <span className="use">{s.use}</span>
+            <span className="use">
+              {s.lbl === "USYC" && usyc
+                ? `${apy}% APY · idle yield`
+                : s.use}
+            </span>
           </div>
         ))}
       </div>
       <div className="stat-row mt-16">
         <div className="stat"><div className="v">320<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}> ms</span></div><div className="k">block time</div></div>
-        <div className="stat"><div className="v">$0.01</div><div className="k">avg gas · USDC</div></div>
+        <div className="stat"><div className="v">$0.00</div><div className="k">user gas · paymaster</div></div>
+        <div className="stat">
+          <div className="v">{apy}<span style={{ fontSize: ".5em", color: "var(--ink-3)" }}>%</span></div>
+          <div className="k">USYC yield · {yieldSource.split("·")[0].trim()}</div>
+        </div>
       </div>
     </section>
   );

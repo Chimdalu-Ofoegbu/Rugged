@@ -1398,3 +1398,585 @@ footer .stamp { margin-top: 36px; font-family: var(--mono); font-size: 10px; col
   :root[data-layout="desktop"] h2.section-title { font-size: clamp(38px, 10vw, 56px); line-height: 0.94; }
   :root[data-layout="desktop"] .btn-xl { max-width: 100%; font-size: 22px; padding: 22px 24px; }
 }
+
+/* ============================================================
+   Wallet modal (Circle Developer-Controlled Wallet onboarding)
+   Reuses the project's design tokens + hover idioms so it
+   matches the rest of the surface and the buttons animate
+   like the bet-confirm and headernav-cta peers.
+   ============================================================ */
+
+/* Header */
+.wallet-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.wallet-modal-kicker {
+  font-size: 10px;
+  color: var(--ember);
+  font-family: var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.wallet-modal-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.wallet-modal-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.wallet-close {
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+}
+.wallet-close:hover {
+  background: var(--bg-1);
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+/* Address card */
+.wallet-address-row {
+  padding: 12px 14px;
+  background: color-mix(in oklch, var(--ink), transparent 96%);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  margin-bottom: 12px;
+}
+.wallet-row-kicker {
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+}
+.wallet-row-kicker--ember { color: var(--ember); }
+.wallet-address-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.wallet-address-mono {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+}
+.wallet-copy {
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.wallet-copy:hover {
+  background: var(--bg-1);
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+/* Balance grid */
+.wallet-balance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.wallet-balance-card {
+  padding: 12px;
+  background: color-mix(in oklch, var(--ink), transparent 98%);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.wallet-balance-card:hover {
+  border-color: var(--ink-3);
+}
+.wallet-balance-card--ember {
+  background: color-mix(in oklch, var(--ember), transparent 94%);
+  border-color: color-mix(in oklch, var(--ember), transparent 75%);
+}
+.wallet-balance-card--ember:hover {
+  border-color: color-mix(in oklch, var(--ember), transparent 50%);
+}
+.wallet-balance-value {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--ink);
+  margin-top: 4px;
+}
+.wallet-balance-foot {
+  font-size: 10px;
+  color: var(--ink-4);
+  margin-top: 4px;
+  font-family: var(--mono);
+}
+
+/* Inline copy */
+.wallet-yield-note {
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.wallet-yield-note b { color: var(--ink); }
+
+/* Primary CTA — ember pill, lift on hover, push on active (matches .confirm) */
+.wallet-primary-btn {
+  width: 100%;
+  background: var(--ember);
+  color: var(--bg);
+  border: none;
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white, transparent 65%),
+    0 8px 20px color-mix(in oklch, var(--ember), transparent 65%);
+  transition: transform .12s ease, box-shadow .15s ease;
+}
+.wallet-primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white, transparent 60%),
+    0 14px 28px color-mix(in oklch, var(--ember), transparent 55%);
+}
+.wallet-primary-btn:active { transform: translateY(1px); }
+.wallet-primary-btn:disabled,
+.wallet-primary-btn.is-loading {
+  background: transparent;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  cursor: wait;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Secondary CTA — outlined pill (refresh balance) */
+.wallet-secondary-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.wallet-secondary-btn:hover {
+  background: var(--bg-1);
+  border-color: var(--ink-3);
+  transform: translateY(-1px);
+}
+.wallet-secondary-btn:active { transform: translateY(1px); }
+.wallet-secondary-btn:disabled {
+  opacity: .5;
+  cursor: wait;
+  transform: none;
+}
+
+/* Side-by-side row for "Refresh balance" + "Disconnect" in the connected modal */
+.wallet-actions-row {
+  display: flex;
+  gap: 8px;
+}
+.wallet-actions-row > .wallet-secondary-btn { flex: 1; }
+.wallet-disconnect-btn {
+  color: var(--ember);
+  border-color: color-mix(in oklch, var(--ember), transparent 65%);
+}
+.wallet-disconnect-btn:hover {
+  background: color-mix(in oklch, var(--ember), transparent 88%);
+  border-color: var(--ember);
+}
+
+/* Connected-state tabs: Balance / Deposit / Withdraw.
+   Implements the WAI-ARIA tab pattern with WCAG-compliant target
+   size (min 44×44 effective via padding+line-height) and 4.5:1
+   contrast on inactive labels via --ink.
+   Manual activation: only the selected tab carries tabindex=0;
+   arrow keys + Home/End move focus between tabs (see markets.jsx). */
+.wallet-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 16px 0 14px;
+  padding: 4px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--ink-5,#1a1a1a);
+  border-radius: 10px;
+}
+.wallet-tab {
+  flex: 1;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid transparent;
+  /* WCAG 1.4.3 AA: --ink against #0c0c0c modal bg = ~16:1, passes
+     AAA. Previous --ink-3 was ~3:1 and failed even AA Large. */
+  color: var(--ink);
+  padding: 10px 12px;
+  border-radius: 7px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.wallet-tab[aria-selected="false"] {
+  /* Slightly dim the inactive labels — still 7:1 against the modal bg
+     (--ink-2 ≈ #b8b8b8), passes WCAG AAA. */
+  color: var(--ink-2,#b8b8b8);
+  font-weight: 500;
+}
+.wallet-tab:hover {
+  color: var(--ink);
+  background: rgba(255,255,255,0.04);
+}
+.wallet-tab:focus { outline: none; }
+.wallet-tab:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+  /* Background hint so keyboard users see the focused inactive tab
+     even before they activate it. */
+  background: rgba(255,255,255,0.05);
+}
+.wallet-tab[aria-selected="true"],
+.wallet-tab.is-active {
+  background: var(--ink);
+  color: #0a0a0a;
+  font-weight: 600;
+}
+.wallet-tab[aria-selected="true"]:focus-visible {
+  /* Different focus indicator for the already-selected tab so it stays
+     visible against the white background. */
+  outline-color: #0a0a0a;
+}
+/* The active panel takes a 0-width focus ring rather than a default
+   browser dotted outline — it's a passive landmark, not a primary
+   interactive target. Removing the visible ring entirely would fail
+   WCAG 2.4.7, so we keep a subtle one for keyboard nav. */
+[role="tabpanel"]:focus { outline: none; }
+[role="tabpanel"]:focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--ember), transparent 60%);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* Deposit tab */
+.wallet-deposit { display: flex; flex-direction: column; gap: 10px; }
+.wallet-deposit-grid {
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 0 6px;
+}
+.wallet-qr-wrap {
+  display: flex;
+  justify-content: center;
+}
+.wallet-deposit-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wallet-deposit-network {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ember);
+  font-weight: 600;
+}
+.wallet-deposit-net-dot {
+  width: 6px; height: 6px; border-radius: 99px;
+  background: var(--ember);
+  box-shadow: 0 0 6px color-mix(in oklch, var(--ember), transparent 40%);
+}
+.wallet-deposit-hint {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.55;
+}
+.wallet-deposit-address {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--ink-5,#1a1a1a);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  word-break: break-all;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.wallet-deposit-foot {
+  font-size: 11px;
+  color: var(--ink-3);
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* Withdraw tab */
+.wallet-withdraw { display: flex; flex-direction: column; gap: 4px; }
+.wallet-input {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--ink-5,#1a1a1a);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  outline: none;
+  transition: border-color .15s ease;
+}
+.wallet-input:focus { border-color: var(--ember); }
+.wallet-input::placeholder { color: var(--ink-4); }
+.wallet-input-address { letter-spacing: 0.04em; }
+.wallet-input-hint {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.wallet-input-hint code {
+  background: rgba(255,255,255,0.05);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: var(--mono);
+}
+.wallet-withdraw-amount-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--ink-5,#1a1a1a);
+  border-radius: 6px;
+  padding: 4px 10px 4px 12px;
+}
+.wallet-withdraw-amount-row:focus-within { border-color: var(--ember); }
+.wallet-withdraw-amount-prefix {
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 14px;
+}
+.wallet-input-amount {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  -moz-appearance: textfield;
+}
+.wallet-input-amount::-webkit-outer-spin-button,
+.wallet-input-amount::-webkit-inner-spin-button {
+  -webkit-appearance: none; margin: 0;
+}
+.wallet-max-btn {
+  background: transparent;
+  border: 1px solid var(--ink-5,#222);
+  color: var(--ink-2);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.wallet-max-btn:hover:not(:disabled) {
+  color: var(--ember);
+  border-color: var(--ember);
+}
+.wallet-max-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.wallet-withdraw-success {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 24px 8px 8px;
+  text-align: center;
+}
+.wallet-withdraw-check {
+  width: 40px; height: 40px; border-radius: 99px;
+  background: color-mix(in oklch, var(--safe, #4ade80), transparent 80%);
+  color: var(--safe, #4ade80);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 4px;
+}
+.wallet-withdraw-success-ttl {
+  font-family: var(--display);
+  font-weight: var(--display-weight);
+  font-size: 22px;
+  color: var(--ink);
+}
+.wallet-withdraw-success-sub {
+  font-size: 12px; color: var(--ink-3); font-family: var(--mono);
+}
+.wallet-withdraw-success-tx {
+  margin-top: 4px;
+  font-size: 11px; color: var(--ember); font-family: var(--mono);
+}
+
+.wallet-primary-btn.is-success {
+  background: var(--safe, #4ade80);
+  color: #0a0a0a;
+}
+
+/* Claim panel — renders on resolved markets in place of the bet UI */
+.claim-panel {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--ink-5,#1a1a1a);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.claim-panel.claim-historical {
+  border-style: dashed;
+  border-color: var(--ink-5,#222);
+}
+.claim-row-kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.claim-headline {
+  font-family: var(--display);
+  font-weight: var(--display-weight);
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: var(--display-tracking);
+}
+.claim-position-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  padding: 10px 0;
+  border-top: 1px dashed var(--ink-5,#1a1a1a);
+  border-bottom: 1px dashed var(--ink-5,#1a1a1a);
+}
+.claim-position-cell { display: flex; flex-direction: column; gap: 4px; }
+.claim-position-cell:last-child { text-align: right; }
+.claim-position-mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+}
+.claim-position-payout {
+  font-family: var(--display);
+  font-weight: var(--display-weight);
+  font-size: 22px;
+  color: var(--safe, #4ade80);
+  line-height: 1;
+}
+.claim-btn {
+  margin-top: 4px;
+}
+.claim-already {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--safe, #4ade80);
+  display: flex;
+  align-items: center;
+}
+.claim-error {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: rgba(238,90,58,0.12);
+  color: var(--ember);
+  font-size: 11px;
+  font-family: var(--mono);
+  border-radius: 4px;
+}
+.claim-foot {
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.55;
+}
+.claim-success {
+  align-items: center;
+  text-align: center;
+  padding: 22px 16px 18px;
+}
+.claim-success-check {
+  width: 44px; height: 44px; border-radius: 99px;
+  background: color-mix(in oklch, var(--safe, #4ade80), transparent 80%);
+  color: var(--safe, #4ade80);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 4px;
+}
+.claim-success-ttl {
+  font-family: var(--display);
+  font-weight: var(--display-weight);
+  font-size: 26px;
+  color: var(--ink);
+}
+.claim-success-sub {
+  font-size: 12px; color: var(--ink-3);
+}
+.claim-success-tx {
+  margin-top: 4px;
+  font-size: 11px; color: var(--ember); font-family: var(--mono);
+}
+
+/* Feature bullets in the disconnected state */
+.wallet-feature-list {
+  margin: 10px 0 18px;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+.wallet-feature-list b { color: var(--ink); }
+
+/* Error surface */
+.wallet-error {
+  margin-top: 12px;
+  padding: 10px;
+  background: color-mix(in oklch, var(--ember), transparent 90%);
+  color: var(--ember);
+  font-family: var(--mono);
+  font-size: 11px;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+/* Connected pill in the header (replaces the ember CTA when authed) */
+.wallet-pill-connected {
+  cursor: pointer;
+}
+.wallet-pill-connected .lbl {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}

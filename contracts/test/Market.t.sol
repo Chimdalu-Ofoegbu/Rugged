@@ -29,8 +29,9 @@ contract MarketTest is Test {
     }
 
     function _newMarket(uint256 ts) internal returns (Market) {
+        // duration = 0 means default 24h
         return new Market(
-            address(usdc), 0, coin, ts, 1_000e6, 8300, address(this), treasury, address(bond)
+            address(usdc), 0, coin, ts, 1_000e6, 8300, 0, address(this), treasury, address(bond)
         );
     }
 
@@ -176,5 +177,157 @@ contract MarketTest is Test {
         assertEq(usdc.balanceOf(treasury), 50e6);
         assertEq(market.distributable(), 0);
         assertEq(market.winningPool(), 0);
+    }
+
+    // --- cancellation ------------------------------------------------------
+
+    function test_cancelBet_refundsYesStakeFully() public {
+        _bet(market, alice, true, 100e6);
+        _bet(market, bob, false, 60e6);
+        uint256 marketBalBefore = usdc.balanceOf(address(market));
+
+        vm.prank(alice);
+        market.cancelBet(true);
+
+        // Alice is refunded the full $100, market USDC drops by exactly $100
+        assertEq(usdc.balanceOf(alice), 100e6);
+        assertEq(usdc.balanceOf(address(market)), marketBalBefore - 100e6);
+
+        // Bookkeeping: yesStake zeroed, yesPool drops, NO side untouched
+        assertEq(market.yesStake(alice), 0);
+        assertEq(market.yesPool(), 0);
+        assertEq(market.noStake(bob), 60e6);
+        assertEq(market.noPool(), 60e6);
+    }
+
+    function test_cancelBet_refundsNoStakeFully() public {
+        _bet(market, alice, true, 100e6);
+        _bet(market, bob, false, 60e6);
+
+        vm.prank(bob);
+        market.cancelBet(false);
+
+        assertEq(usdc.balanceOf(bob), 60e6);
+        assertEq(market.noStake(bob), 0);
+        assertEq(market.noPool(), 0);
+        // Alice's YES side completely untouched
+        assertEq(market.yesStake(alice), 100e6);
+        assertEq(market.yesPool(), 100e6);
+    }
+
+    function test_cancelBet_cancelsOnlyChosenSide() public {
+        // Alice stakes on BOTH sides — only the side she cancels should refund.
+        _bet(market, alice, true, 40e6);
+        _bet(market, alice, false, 25e6);
+
+        vm.prank(alice);
+        market.cancelBet(true);
+
+        assertEq(usdc.balanceOf(alice), 40e6);    // YES refund only
+        assertEq(market.yesStake(alice), 0);
+        assertEq(market.noStake(alice), 25e6);     // NO stake intact
+        assertEq(market.yesPool(), 0);
+        assertEq(market.noPool(), 25e6);
+    }
+
+    function test_cancelBet_emitsEvent() public {
+        _bet(market, alice, true, 100e6);
+        vm.expectEmit(true, false, false, true, address(market));
+        emit Market.BetCancelled(alice, true, 100e6);
+        vm.prank(alice);
+        market.cancelBet(true);
+    }
+
+    function test_cancelBet_canRePlaceAfter() public {
+        // The "I changed my mind" UX: cancel + place a new bet on the other side.
+        _bet(market, alice, true, 50e6);
+
+        vm.prank(alice);
+        market.cancelBet(true);
+        assertEq(market.yesStake(alice), 0);
+
+        // Re-enter on NO. Mint fresh USDC because cancel returned hers.
+        _bet(market, alice, false, 30e6);
+        assertEq(market.noStake(alice), 30e6);
+        assertEq(market.noPool(), 30e6);
+    }
+
+    function test_cancelBet_doesNotAffectOtherBettors() public {
+        _bet(market, alice, true, 100e6);
+        _bet(market, bob, true, 50e6); // bob also on YES
+
+        vm.prank(alice);
+        market.cancelBet(true);
+
+        // Bob's YES position is untouched; yesPool reflects only bob's stake.
+        assertEq(market.yesStake(bob), 50e6);
+        assertEq(market.yesPool(), 50e6);
+        assertEq(market.yesStake(alice), 0);
+    }
+
+    function test_cancelBet_revertsAfterExpiry() public {
+        _bet(market, alice, true, 100e6);
+        vm.warp(market.expiry());
+        vm.prank(alice);
+        vm.expectRevert(Market.BettingClosed.selector);
+        market.cancelBet(true);
+    }
+
+    function test_cancelBet_revertsAfterResolved() public {
+        _bet(market, alice, true, 100e6);
+        _bet(market, bob, false, 60e6);
+        vm.warp(market.expiry());
+        market.settle(true);
+
+        vm.prank(alice);
+        vm.expectRevert(Market.AlreadyResolved.selector);
+        market.cancelBet(true);
+    }
+
+    function test_cancelBet_revertsWithNoStake() public {
+        vm.prank(alice);
+        vm.expectRevert(Market.NothingToCancel.selector);
+        market.cancelBet(true);
+    }
+
+    function test_cancelBet_revertsWhenCancellingWrongSide() public {
+        // Alice staked on YES only — cancelling NO must revert.
+        _bet(market, alice, true, 100e6);
+        vm.prank(alice);
+        vm.expectRevert(Market.NothingToCancel.selector);
+        market.cancelBet(false);
+    }
+
+    function test_cancelBet_twiceReverts() public {
+        _bet(market, alice, true, 100e6);
+        vm.startPrank(alice);
+        market.cancelBet(true);
+        vm.expectRevert(Market.NothingToCancel.selector);
+        market.cancelBet(true);
+        vm.stopPrank();
+    }
+
+    function test_cancelBet_settlementUsesRemainingPools() public {
+        // Three bettors. Alice cancels before settlement; the remaining
+        // pool drives the fee + distributable calc as if she never bet.
+        _bet(market, alice, true, 100e6); // cancels
+        _bet(market, bob, true, 50e6);
+        _bet(market, carol, false, 40e6);
+
+        vm.prank(alice);
+        market.cancelBet(true);
+
+        vm.warp(market.expiry());
+        market.settle(true); // YES wins (only bob)
+
+        // Losing pool = 40e6 (carol). distributable = 40e6 * 0.98 = 39.2e6.
+        // winningPool reflects only the remaining YES stake (bob = 50e6).
+        assertEq(market.winningPool(), 50e6);
+        assertEq(market.distributable(), 40e6 - (40e6 * 200) / 10_000);
+
+        // Bob claims and receives stake + entire distributable (he's the only winner).
+        vm.prank(bob);
+        market.claim();
+        assertEq(usdc.balanceOf(bob), 50e6 + market.distributable());
     }
 }

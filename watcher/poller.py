@@ -54,9 +54,15 @@ def run(
     interval: int = DEFAULT_INTERVAL_SECONDS,
     once: bool = False,
     sink: Callable[[RuggedSignal], None] | None = None,
+    on_tick_complete: Callable[[], None] | None = None,
     out: TextIO = sys.stdout,
 ) -> None:
-    """Run the poll loop. Calls `sink` for each fresh signal, plus prints."""
+    """Run the poll loop. Calls `sink` for each fresh signal, plus prints.
+
+    `on_tick_complete` (if provided) fires after every poll cycle —
+    used by the orchestrator to drive the resolver daemon (price
+    tracking + auto-resolve at expiry) on the same cadence.
+    """
     seen: set[str] = set()
     while True:
         ts = time.strftime("%H:%M:%S")
@@ -73,6 +79,11 @@ def run(
         else:
             out.write(f"[{ts}] (no new signals — {len(seen)} seen so far)\n")
             out.flush()
+        if on_tick_complete:
+            try:
+                on_tick_complete()
+            except Exception as exc:  # noqa: BLE001 — between-tick failure must not kill the watcher
+                log.warning("on_tick_complete failed: %s", exc)
         if once:
             return
         time.sleep(interval)

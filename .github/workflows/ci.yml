@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel any in-progress run on the same ref when a new push lands.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  forge-tests:
+    name: forge test (contracts)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Build
+        run: forge build --sizes
+
+      - name: Test
+        run: forge test -vv
+
+  pytest:
+    name: pytest (api)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: latest
+
+      - name: Sync dependencies
+        run: uv sync --frozen
+
+      - name: Run pytest
+        env:
+          # Minimum env vars conftest expects. CI doesn't talk to Arc — chain
+          # calls are monkeypatched out per test.
+          ARC_RPC_URL: https://example.invalid
+          ARC_CHAIN_ID: "5042002"
+          DEPLOYER_PRIVATE_KEY: "0x0000000000000000000000000000000000000000000000000000000000000001"
+          PAYMASTER_SIGNER_PRIVATE_KEY: "0x0000000000000000000000000000000000000000000000000000000000000002"
+          PAYMASTER_SIGNER_ADDRESS: "0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf"
+          PAYMASTER_ADDRESS: "0xBCF0bc5f29da7440D64Df1D569f7Db0B6fdE75D0"
+          ENTRYPOINT_ADDRESS: "0x0000000071727De22E5E9d8BAf0edAc6f37da032"
+          MARKET_FACTORY_ADDRESS: "0x554137E2ABdAD6bEcc7638DD454a9abC8418515F"
+          MARKET_RESOLUTION_ADDRESS: "0x7eA19d8720928a80b270143f73086F758e8DF540"
+          REPUTATION_BOND_ADDRESS: "0xCF622869df8BB703Bd5C30910aa030be2cd1D6fA"
+          TRACE_REGISTRY_ADDRESS: "0x8a725BB5dE0093f282243D6FE880fbAD2E2825c2"
+          TREASURY_ADDRESS: "0x8C392851e1Ea33b5F2dbfE3378BEc5a9Aa4eC59D"
+          USDC_ADDRESS: "0x3600000000000000000000000000000000000000"
+          USYC_ADDRESS: "0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C"
+        run: uv run pytest tests/ -v
+
+  web-typecheck:
+    name: tsc --noEmit + vite build (web)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build

@@ -30,7 +30,7 @@ contract ResolutionTest is Test {
     }
 
     function _market(uint256 blacklistPrice) internal returns (Market) {
-        uint256 id = factory.createMarket(coin, block.timestamp, blacklistPrice, 8000);
+        uint256 id = factory.createMarket(coin, block.timestamp, blacklistPrice, 8000, 0);
         return Market(factory.getMarket(id));
     }
 

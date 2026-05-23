@@ -14,6 +14,27 @@
       "runtimeArgs": ["--yes", "http-server", "project", "-c-1", "--silent"],
       "port": 5181,
       "autoPort": true
+    },
+    {
+      "name": "api: rugged (FastAPI + project)",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "uvicorn", "api.main:app", "--host", "127.0.0.1", "--port", "8001", "--reload"],
+      "port": 8001,
+      "autoPort": true
+    },
+    {
+      "name": "web: vite dev (Privy + Arc)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "web"],
+      "port": 5173,
+      "autoPort": true
+    },
+    {
+      "name": "orchestrator: watcher + resolver",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "python", "-m", "orchestrator", "--interval", "30"],
+      "port": 0,
+      "autoPort": true
     }
   ]
 }

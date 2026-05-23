@@ -12,6 +12,7 @@ dependencies = [
     # chain
     "web3>=6.20",
     "eth-account>=0.13",
+    "base58>=2.1",
     # agents — LLM reasoning layer
     "anthropic>=0.40",
     # backend API (Phase 5)

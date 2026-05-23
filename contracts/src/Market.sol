@@ -26,7 +26,8 @@ import {IReputationBond} from "./interfaces/IReputationBond.sol";
 contract Market is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    uint256 public constant MARKET_DURATION = 24 hours;
+    /// @notice Default window if the factory passes 0 to the duration param.
+    uint256 public constant DEFAULT_DURATION = 24 hours;
     uint256 private constant TREASURY_BPS = 120; // 1.2%
     uint256 private constant BOND_BPS = 80; // 0.8%
 
@@ -56,6 +57,7 @@ contract Market is ReentrancyGuard {
     mapping(address => bool) public claimed;
 
     event BetPlaced(address indexed bettor, bool isYes, uint256 amount);
+    event BetCancelled(address indexed bettor, bool isYes, uint256 amount);
     event Settled(bool yesWon, uint256 winningPool, uint256 distributable, uint256 fee);
     event Claimed(address indexed bettor, uint256 payout);
 
@@ -67,6 +69,7 @@ contract Market is ReentrancyGuard {
     error NotYetExpired();
     error AlreadyClaimed();
     error NothingToClaim();
+    error NothingToCancel();
 
     constructor(
         address _usdc,
@@ -75,6 +78,7 @@ contract Market is ReentrancyGuard {
         uint256 _blacklistTimestamp,
         uint256 _blacklistPrice,
         uint256 _seedProbabilityBps,
+        uint256 _duration,
         address _resolution,
         address _treasury,
         address _reputationBond
@@ -85,7 +89,10 @@ contract Market is ReentrancyGuard {
         blacklistTimestamp = _blacklistTimestamp;
         blacklistPrice = _blacklistPrice;
         seedProbabilityBps = _seedProbabilityBps;
-        expiry = _blacklistTimestamp + MARKET_DURATION;
+        // Duration of 0 means "use the canonical 24h window" — keeps the
+        // factory's calling convention backward-compatible for callers that
+        // don't care about short demo markets.
+        expiry = _blacklistTimestamp + (_duration == 0 ? DEFAULT_DURATION : _duration);
         resolution = _resolution;
         treasury = _treasury;
         reputationBond = _reputationBond;
@@ -107,6 +114,30 @@ contract Market is ReentrancyGuard {
             noStake[msg.sender] += amount;
         }
         emit BetPlaced(msg.sender, isYes, amount);
+    }
+
+    /// @notice Withdraw the full stake on the chosen side and exit the
+    ///         market. Only valid while the market is open (pre-expiry,
+    ///         unresolved). Refunds 100% of the stake — no fee.
+    /// @dev    No partial cancels: this is "I changed my mind" UX, not
+    ///         a trading primitive. Users can re-enter via placeBet.
+    function cancelBet(bool isYes) external nonReentrant {
+        if (resolved) revert AlreadyResolved();
+        if (block.timestamp >= expiry) revert BettingClosed();
+
+        uint256 stake = isYes ? yesStake[msg.sender] : noStake[msg.sender];
+        if (stake == 0) revert NothingToCancel();
+
+        if (isYes) {
+            yesStake[msg.sender] = 0;
+            yesPool -= stake;
+        } else {
+            noStake[msg.sender] = 0;
+            noPool -= stake;
+        }
+
+        usdc.safeTransfer(msg.sender, stake);
+        emit BetCancelled(msg.sender, isYes, stake);
     }
 
     /// @notice Current implied probabilities in basis points (yesBps + noBps
