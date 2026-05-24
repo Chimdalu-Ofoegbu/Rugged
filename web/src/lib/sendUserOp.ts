@@ -18,11 +18,60 @@
 //      Backend self-bundler relays it through EntryPoint.handleOps.
 
 import type { SmartAccountClient } from "permissionless";
-import { encodeFunctionData, type Hex } from "viem";
+import { decodeAbiParameters, encodeFunctionData, type Hex } from "viem";
 import { toPackedUserOperation, type UserOperation } from "viem/account-abstraction";
 
 import { API_BASE, ARC_CHAIN_ID } from "../config";
 import { publicClient } from "./viemClient";
+
+/// Decode a Solidity revert payload into a human-readable string. Handles:
+///   - Standard Error(string): `0x08c379a0` + ABI-encoded string
+///   - Standard Panic(uint256): `0x4e487b71` + uint256 panic code
+///   - Empty revert (returndatasize == 0)
+///   - Custom errors / unknown selectors — falls through with the raw hex
+/// Without this the user sees ~200 chars of hex spilling out of the modal.
+export function decodeRevertReason(data: string | null | undefined): string {
+  if (!data) return "(no revert data)";
+  const hex = data.startsWith("0x") ? data : `0x${data}`;
+  if (hex === "0x" || hex.length <= 2) return "(empty revert — likely out-of-gas or assert)";
+  const selector = hex.slice(0, 10).toLowerCase();
+  const payload = ("0x" + hex.slice(10)) as Hex;
+  // Error(string) — `revert("ERC20: transfer amount exceeds balance")` etc.
+  if (selector === "0x08c379a0") {
+    try {
+      const [reason] = decodeAbiParameters([{ type: "string" }], payload);
+      const trimmed = String(reason).trim();
+      return trimmed.length ? trimmed : "(empty Error(string))";
+    } catch {
+      return `Error(string) — undecodable payload ${hex.slice(0, 80)}…`;
+    }
+  }
+  // Panic(uint256) — solc-inserted bounds/overflow/etc. checks.
+  if (selector === "0x4e487b71") {
+    try {
+      const [code] = decodeAbiParameters([{ type: "uint256" }], payload);
+      const codeNum = Number(code);
+      const codeMap: Record<number, string> = {
+        0x01: "assertion failed",
+        0x11: "arithmetic overflow/underflow",
+        0x12: "division or modulo by zero",
+        0x21: "enum out of range",
+        0x22: "storage byte array incorrectly encoded",
+        0x31: "pop on empty array",
+        0x32: "array index out of bounds",
+        0x41: "out of memory",
+        0x51: "called zero-initialized variable of internal function type",
+      };
+      const label = codeMap[codeNum] ?? `panic code 0x${codeNum.toString(16)}`;
+      return `Panic: ${label}`;
+    } catch {
+      return `Panic(uint256) — undecodable payload`;
+    }
+  }
+  // Custom error or unrecognized — return shortened selector + raw.
+  const shortHex = hex.length > 80 ? `${hex.slice(0, 76)}…` : hex;
+  return `Custom error ${selector} (${shortHex})`;
+}
 
 export type SendUserOpResult = {
   userOpHash: Hex;
@@ -206,10 +255,15 @@ export async function sendUserOp(
   };
 
   if (!body.success) {
-    throw new Error(
-      "UserOp validated but inner call reverted" +
-      (body.revertReason ? `: ${body.revertReason}` : ""),
-    );
+    const decoded = decodeRevertReason(body.revertReason);
+    // Log the raw hex for debugging — Solidity custom errors aren't decodable
+    // without the contract ABI, and dev needs the raw bytes to look up the
+    // selector against the deployed contracts.
+    if (body.revertReason) {
+      // eslint-disable-next-line no-console
+      console.warn("[sendUserOp] inner call reverted. raw:", body.revertReason);
+    }
+    throw new Error(`Inner call reverted: ${decoded}`);
   }
 
   return {

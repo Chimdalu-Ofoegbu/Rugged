@@ -2114,7 +2114,10 @@ footer .stamp { margin-top: 36px; font-family: var(--mono); font-size: 10px; col
   color: var(--ink-3);
 }
 
-/* Error surface */
+/* Error surface — wraps long hex revert payloads so they don't overflow
+   the modal width. `overflow-wrap: anywhere` is the modern way to force
+   break-anywhere on arbitrary characters (including hex strings with no
+   spaces); fall back to `word-break: break-all` for older browsers. */
 .wallet-error {
   margin-top: 12px;
   padding: 10px;
@@ -2124,6 +2127,10 @@ footer .stamp { margin-top: 36px; font-family: var(--mono); font-size: 10px; col
   font-size: 11px;
   border-radius: 4px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* Connected pill in the header (replaces the ember CTA when authed) */
