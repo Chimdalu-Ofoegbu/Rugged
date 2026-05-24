@@ -1712,28 +1712,40 @@ footer .stamp { margin-top: 36px; font-family: var(--mono); font-size: 10px; col
 .wallet-export-otp {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-.wallet-export-otp-row {
-  display: flex;
-  gap: 8px;
-  align-items: stretch;
+  gap: 10px;
 }
 /* Compound selector to win over .wallet-input (same specificity, later in
-   source order). Without this the OTP looks like a normal 12px field. */
+   source order). Without this the OTP looks like a normal 12px field — and
+   crucially the border / background fade into the dark export-row container,
+   so the user can't tell where to type. */
 .wallet-export-otp .wallet-export-otp-input.wallet-input {
   font-family: var(--mono);
-  letter-spacing: 0.4em;
+  letter-spacing: 0.5em;
   text-align: center;
-  font-size: 16px;
-  padding-inline: 0;
-  flex: 1;
-  min-width: 0;
+  font-size: 20px;
+  padding: 14px 12px;
+  background: #000;
+  border: 1px solid var(--ink-4, #555);
+  color: var(--ink);
+  width: 100%;
+}
+.wallet-export-otp .wallet-export-otp-input.wallet-input::placeholder {
+  letter-spacing: 0.3em;
+  color: var(--ink-4, #555);
+  opacity: 0.7;
+}
+.wallet-export-otp .wallet-export-otp-input.wallet-input:focus {
+  border-color: var(--ember);
+  background: #0a0a0a;
+}
+.wallet-export-verify-btn {
+  width: 100%;
 }
 .wallet-export-otp-actions {
   display: flex;
   gap: 14px;
   font-size: 11.5px;
+  margin-top: 2px;
 }
 .wallet-export-link {
   background: none;

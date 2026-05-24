@@ -760,29 +760,28 @@ function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress })
               <label className="wallet-row-kicker" htmlFor="wallet-export-code">
                 Code sent to {w.exportEmail}
               </label>
-              <div className="wallet-export-otp-row">
-                <input
-                  id="wallet-export-code"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  autoComplete="one-time-code"
-                  maxLength={6}
-                  placeholder="123456"
-                  value={exportCode}
-                  onChange={(e) => setExportCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  disabled={exportStep === "verifying"}
-                  className="wallet-input wallet-export-otp-input"
-                  autoFocus
-                />
-                <button
-                  type="submit"
-                  disabled={exportStep === "verifying" || exportCode.length < 6}
-                  className="wallet-secondary-btn wallet-export-btn"
-                >
-                  {exportStep === "verifying" ? "Verifying…" : "Verify"}
-                </button>
-              </div>
+              <input
+                id="wallet-export-code"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="one-time-code"
+                maxLength={6}
+                placeholder="• • • • • •"
+                value={exportCode}
+                onChange={(e) => setExportCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                disabled={exportStep === "verifying"}
+                className="wallet-input wallet-export-otp-input"
+                autoFocus
+                aria-label="6-digit verification code"
+              />
+              <button
+                type="submit"
+                disabled={exportStep === "verifying" || exportCode.length < 6}
+                className="wallet-primary-btn wallet-export-verify-btn"
+              >
+                {exportStep === "verifying" ? "Verifying…" : "Verify & reveal key"}
+              </button>
               <div className="wallet-export-otp-actions">
                 <button
                   type="button"
