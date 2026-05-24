@@ -724,21 +724,28 @@ function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress })
       {w.requestExportCode && (
         <div className="wallet-export-row">
           <div className="wallet-export-meta">
-            <div className="wallet-row-kicker">Advanced · private key</div>
+            <div className="wallet-row-kicker">Advanced · Recovery phrase</div>
             <div className="wallet-export-hint">
-              Export the embedded EOA signer's private key (the EOA, not the
-              smart account — the EOA address may differ from the one shown
-              above). We'll email a 6-digit code to <b>{w.exportEmail}</b> for
-              verification, then open Privy's iframe-isolated reveal modal.
+              Export your wallet's <b>recovery phrase</b> — the 12 or 24
+              BIP-39 words Privy derived your embedded EOA from. Importing
+              it into MetaMask, Rabby, or any standard wallet client restores
+              the same address. We'll email a 6-digit code to{" "}
+              <b>{w.exportEmail}</b> for verification first, then open
+              Privy's iframe-isolated reveal modal.
             </div>
             {exportStep === "idle" && (
               <div className="wallet-export-hint wallet-export-hint--inset">
-                <b>In the Privy modal:</b> click the large primary button
-                labeled <i>“Copy key”</i> — that copies the 64-char private key
-                to your clipboard. The smaller icon-button next to the wallet
-                address copies the <i>address</i>, not the key. A correct paste
-                starts with <code>0x</code> and is <b>66 characters total</b>;
-                a 42-char paste means you copied the address.
+                <b>Why a phrase and not a raw private key:</b> Privy
+                provisions your wallet inside a Trusted Execution
+                Environment (TEE), so the 32-byte signing key never leaves
+                the enclave by design — extracting it isn't possible, and
+                that's the whole security model. The recovery phrase IS
+                exportable and fully derives the wallet on any BIP-39 client.
+                <br /><br />
+                <b>In the Privy modal:</b> look for the <i>“Recovery phrase”</i>
+                or <i>“Seed phrase”</i> option (may be a tab, link, or second
+                button — Privy's UI varies). Ignore the <i>“Copy key”</i>
+                button — for TEE wallets it has no key to copy.
               </div>
             )}
           </div>
@@ -749,9 +756,9 @@ function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress })
               onClick={startExport}
               disabled={w.loading}
               className="wallet-secondary-btn wallet-export-btn"
-              title="Reveals the EOA private key behind your smart account. Requires email verification."
+              title="Reveals the BIP-39 recovery phrase for your embedded wallet. Requires email verification."
             >
-              Export wallet
+              Export recovery phrase
             </button>
           )}
 
@@ -790,7 +797,7 @@ function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress })
                 disabled={exportStep === "verifying" || exportCode.length < 6}
                 className="wallet-primary-btn wallet-export-verify-btn"
               >
-                {exportStep === "verifying" ? "Verifying…" : "Verify & reveal key"}
+                {exportStep === "verifying" ? "Verifying…" : "Verify & open recovery"}
               </button>
               <div className="wallet-export-otp-actions">
                 <button
