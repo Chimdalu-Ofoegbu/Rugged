@@ -68,7 +68,14 @@ async function boot() {
           loginMethods: ["email", "wallet"],
           appearance: {
             theme: "dark",
-            accentColor: "#ee5a3a",
+            // Slightly muted ember. Our app uses the brighter #ee5a3a for
+            // its own primary CTAs, but Privy applies accentColor to ALL of
+            // its hosted-modal buttons (login, connect, export-key) which
+            // makes the bright value read as "danger" rather than "primary"
+            // — especially loud on the full-width "Copy key" button in the
+            // export modal. The muted variant stays on-brand without
+            // overwhelming the iframe.
+            accentColor: "#c95637",
             // Email is the headline primary CTA; wallet sits underneath.
             showWalletLoginFirst: false,
           },

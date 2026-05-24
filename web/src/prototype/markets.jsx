@@ -726,11 +726,21 @@ function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress })
           <div className="wallet-export-meta">
             <div className="wallet-row-kicker">Advanced · private key</div>
             <div className="wallet-export-hint">
-              Export the embedded signer's private key. We'll email a 6-digit
-              code to <b>{w.exportEmail}</b> for verification, then reveal the
-              key in a sandboxed iframe you can copy to MetaMask, Rabby, or any
-              wallet client.
+              Export the embedded EOA signer's private key (the EOA, not the
+              smart account — the EOA address may differ from the one shown
+              above). We'll email a 6-digit code to <b>{w.exportEmail}</b> for
+              verification, then open Privy's iframe-isolated reveal modal.
             </div>
+            {exportStep === "idle" && (
+              <div className="wallet-export-hint wallet-export-hint--inset">
+                <b>In the Privy modal:</b> click the large primary button
+                labeled <i>“Copy key”</i> — that copies the 64-char private key
+                to your clipboard. The smaller icon-button next to the wallet
+                address copies the <i>address</i>, not the key. A correct paste
+                starts with <code>0x</code> and is <b>66 characters total</b>;
+                a 42-char paste means you copied the address.
+              </div>
+            )}
           </div>
 
           {exportStep === "idle" && (
