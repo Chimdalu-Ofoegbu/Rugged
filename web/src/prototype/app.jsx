@@ -759,7 +759,12 @@ function CTA() {
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
         </span>
       </a>
-      <a href="#" className="btn-xl btn-xl-fx btn-xl-fx--ghost mt-16">
+      <a
+        href="https://t.me/rugged_token_bot"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-xl btn-xl-fx btn-xl-fx--ghost mt-16"
+      >
         <span className="arrow arrow-dup" aria-hidden>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m0 0L7.5 3.5M11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
         </span>
