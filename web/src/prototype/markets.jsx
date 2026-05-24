@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import ReactDOM from "react-dom";
 import qrcode from "qrcode-generator";
 
@@ -326,6 +326,18 @@ function WalletModal({ open, onClose }) {
   // (regardless of whether THIS browser session has connected to it)? Drives
   // the disconnected-state copy: first-time = "Provision", returning = "Reconnect".
   const [recordExists, setRecordExists] = useState(null);  // null = loading, bool once known
+  // Shared confirmation state — any copy-address button in the modal flips this
+  // to render a centered toast that auto-dismisses.
+  const [copyToast, setCopyToast] = useState(false);
+  const copyToastTimer = useRef(null);
+  const copyAddress = useCallback(() => {
+    if (!w.address) return;
+    try { navigator.clipboard?.writeText(w.address); } catch (_) { /* non-secure context */ }
+    setCopyToast(true);
+    if (copyToastTimer.current) clearTimeout(copyToastTimer.current);
+    copyToastTimer.current = setTimeout(() => setCopyToast(false), 1600);
+  }, [w.address]);
+  useEffect(() => () => { if (copyToastTimer.current) clearTimeout(copyToastTimer.current); }, []);
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -334,6 +346,7 @@ function WalletModal({ open, onClose }) {
     window.addEventListener("keydown", onKey);
     // Reset to balance view every time the modal opens.
     setView("balance");
+    setCopyToast(false);
     // Cheap, no-balance check — the dedicated /wallet/exists endpoint.
     // Scoped to this browser's user_id via the apiFetch header.
     if (!w.exists) {
@@ -416,8 +429,21 @@ function WalletModal({ open, onClose }) {
           color: "var(--ink)",
           boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
           margin: "auto",
+          position: "relative",
         }}
       >
+        {copyToast && (
+          <div
+            className="wallet-copy-toast"
+            role="status"
+            aria-live="polite"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>Wallet address copied</span>
+          </div>
+        )}
         <div className="wallet-modal-head">
           <div>
             <div className="wallet-modal-kicker">Privy · smart account · Arc</div>
@@ -481,6 +507,7 @@ function WalletModal({ open, onClose }) {
                   usyc={usyc}
                   shortAddr={shortAddr}
                   onClose={onClose}
+                  onCopyAddress={copyAddress}
                 />
               </div>
             )}
@@ -501,7 +528,7 @@ function WalletModal({ open, onClose }) {
                 aria-labelledby="wallet-tab-deposit"
                 tabIndex={0}
               >
-                <WalletDepositView w={w} />
+                <WalletDepositView w={w} onCopyAddress={copyAddress} />
               </div>
             )}
             {view === "withdraw" && (
@@ -551,7 +578,7 @@ function WalletModal({ open, onClose }) {
   );
 }
 
-function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose }) {
+function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress }) {
   // Demo-faucet state — { loading, result, error }.
   const [faucet, setFaucet] = useState({ loading: false, result: null, error: null });
 
@@ -576,8 +603,9 @@ function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose }) {
         <div className="wallet-address-line">
           <span className="wallet-address-mono">{shortAddr}</span>
           <button
+            type="button"
             className="btn-pill wallet-copy"
-            onClick={() => { navigator.clipboard?.writeText(w.address); }}
+            onClick={onCopyAddress}
           >
             copy
           </button>
@@ -768,14 +796,12 @@ function WalletBetsView({ onClose }) {
   );
 }
 
-function WalletDepositView({ w }) {
+function WalletDepositView({ w, onCopyAddress }) {
   const [copied, setCopied] = useState(false);
   function copy() {
-    try {
-      navigator.clipboard?.writeText(w.address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1400);
-    } catch (_) { /* non-secure context */ }
+    onCopyAddress?.();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1400);
   }
   return (
     <div className="wallet-deposit">

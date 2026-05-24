@@ -227,8 +227,17 @@ export function usePrivyWallet(): WalletWithActions {
           }
         }
         toRemove.forEach((k) => ls.removeItem(k));
-      } catch { /* private mode or storage disabled — proceed to reload */ }
-      window.location.reload();
+      } catch { /* private mode or storage disabled — proceed below */ }
+      // Only reload if an INJECTED wallet (Rabby/MetaMask/Coinbase/WalletConnect)
+      // was connected. Privy's EIP-6963 discovery re-grabs those on the next
+      // render even after logout + storage purge, so a hard reload is the only
+      // reliable teardown. For pure-email users on the Privy embedded wallet,
+      // logout() flips `authenticated` to false and useSmartAccount unwinds —
+      // the snapshot returns DISCONNECTED in-place, no reload needed.
+      const hasInjectedWallet = wallets.some((w) => w.walletClientType !== "privy");
+      if (hasInjectedWallet) {
+        window.location.reload();
+      }
     }
   }, [logout, wallets]);
 
