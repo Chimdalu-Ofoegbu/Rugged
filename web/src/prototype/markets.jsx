@@ -581,6 +581,56 @@ function WalletModal({ open, onClose }) {
 function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress }) {
   // Demo-faucet state — { loading, result, error }.
   const [faucet, setFaucet] = useState({ loading: false, result: null, error: null });
+  // Export-wallet OTP gate state.
+  //   "idle"        — show the trigger button
+  //   "sending"     — Privy is emailing the code
+  //   "awaiting"    — code sent; show the OTP input
+  //   "verifying"   — OTP submitted; awaiting verification + key-modal handoff
+  // The component returns to "idle" after the Privy export modal closes
+  // (privyExportWallet's promise resolves on modal exit) or on cancel.
+  const [exportStep, setExportStep] = useState("idle");
+  const [exportCode, setExportCode] = useState("");
+  const [exportError, setExportError] = useState(null);
+
+  async function startExport() {
+    if (!w.requestExportCode || exportStep !== "idle") return;
+    setExportError(null);
+    setExportCode("");
+    setExportStep("sending");
+    try {
+      await w.requestExportCode();
+      setExportStep("awaiting");
+    } catch (e) {
+      setExportError(e?.message || "Could not send verification code");
+      setExportStep("idle");
+    }
+  }
+
+  async function submitExportCode(e) {
+    if (e) e.preventDefault();
+    if (!w.verifyExportCodeAndReveal || exportStep !== "awaiting") return;
+    if (!exportCode.trim()) {
+      setExportError("Enter the 6-digit code from your email");
+      return;
+    }
+    setExportError(null);
+    setExportStep("verifying");
+    try {
+      await w.verifyExportCodeAndReveal(exportCode);
+      // Privy's export modal has closed (its promise resolved). Reset.
+      setExportCode("");
+      setExportStep("idle");
+    } catch (err) {
+      setExportError(err?.message || "Invalid code — try again");
+      setExportStep("awaiting");
+    }
+  }
+
+  function cancelExport() {
+    setExportStep("idle");
+    setExportCode("");
+    setExportError(null);
+  }
 
   async function claimFaucet() {
     if (faucet.loading) return;
@@ -670,6 +720,95 @@ function WalletBalanceView({ w, usdc, usyc, shortAddr, onClose, onCopyAddress })
           Disconnect
         </button>
       </div>
+
+      {w.requestExportCode && (
+        <div className="wallet-export-row">
+          <div className="wallet-export-meta">
+            <div className="wallet-row-kicker">Advanced · private key</div>
+            <div className="wallet-export-hint">
+              Export the embedded signer's private key. We'll email a 6-digit
+              code to <b>{w.exportEmail}</b> for verification, then reveal the
+              key in a sandboxed iframe you can copy to MetaMask, Rabby, or any
+              wallet client.
+            </div>
+          </div>
+
+          {exportStep === "idle" && (
+            <button
+              type="button"
+              onClick={startExport}
+              disabled={w.loading}
+              className="wallet-secondary-btn wallet-export-btn"
+              title="Reveals the EOA private key behind your smart account. Requires email verification."
+            >
+              Export wallet
+            </button>
+          )}
+
+          {exportStep === "sending" && (
+            <button
+              type="button"
+              disabled
+              className="wallet-secondary-btn wallet-export-btn"
+            >
+              Sending code…
+            </button>
+          )}
+
+          {(exportStep === "awaiting" || exportStep === "verifying") && (
+            <form className="wallet-export-otp" onSubmit={submitExportCode}>
+              <label className="wallet-row-kicker" htmlFor="wallet-export-code">
+                Code sent to {w.exportEmail}
+              </label>
+              <div className="wallet-export-otp-row">
+                <input
+                  id="wallet-export-code"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  placeholder="123456"
+                  value={exportCode}
+                  onChange={(e) => setExportCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  disabled={exportStep === "verifying"}
+                  className="wallet-input wallet-export-otp-input"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  disabled={exportStep === "verifying" || exportCode.length < 6}
+                  className="wallet-secondary-btn wallet-export-btn"
+                >
+                  {exportStep === "verifying" ? "Verifying…" : "Verify"}
+                </button>
+              </div>
+              <div className="wallet-export-otp-actions">
+                <button
+                  type="button"
+                  onClick={cancelExport}
+                  disabled={exportStep === "verifying"}
+                  className="wallet-export-link"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={startExport}
+                  disabled={exportStep === "verifying"}
+                  className="wallet-export-link"
+                >
+                  Resend code
+                </button>
+              </div>
+            </form>
+          )}
+
+          {exportError && (
+            <div className="wallet-export-error">{exportError}</div>
+          )}
+        </div>
+      )}
     </>
   );
 }

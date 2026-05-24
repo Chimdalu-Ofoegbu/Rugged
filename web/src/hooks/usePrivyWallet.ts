@@ -20,7 +20,7 @@
 // On `disconnect()`: Privy logout. Browser-local — on-chain state stays.
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLogin, useLogout, usePrivy, useWallets } from "@privy-io/react-auth";
+import { useLogin, useLoginWithEmail, useLogout, usePrivy, useWallets } from "@privy-io/react-auth";
 import type { SmartAccountClient } from "permissionless";
 
 import { CONTRACTS } from "../config";
@@ -64,6 +64,17 @@ export type WalletWithActions = WalletSnapshot & {
   connect: () => Promise<void>;
   refresh: () => Promise<void>;
   disconnect: () => Promise<void>;
+  /// Two-step gate for the embedded-wallet private key. Privy's default
+  /// `exportWallet()` reveals the key WITHOUT re-auth — so we layer our own
+  /// email-OTP step on top:
+  ///   1. requestExportCode() — Privy emails a 6-digit code to user.email.
+  ///   2. verifyExportCodeAndReveal(code) — verifies via Privy's loginWithCode,
+  ///      then opens Privy's hosted (cross-origin iframe) export modal.
+  /// Both are null for injected wallets (Rabby/MetaMask/Coinbase) — those
+  /// manage their own key export through the wallet extension.
+  exportEmail: string | null;
+  requestExportCode: (() => Promise<void>) | null;
+  verifyExportCodeAndReveal: ((code: string) => Promise<void>) | null;
 };
 
 async function readUsdcBalance(address: `0x${string}`): Promise<WalletBalance> {
@@ -89,11 +100,16 @@ async function readUsdcBalance(address: `0x${string}`): Promise<WalletBalance> {
 
 /// Returns the same shape `useWallet` did, sourced from Privy + smart-account.
 export function usePrivyWallet(): WalletWithActions {
-  const { ready, authenticated } = usePrivy();
+  const { ready, authenticated, user, exportWallet: privyExportWallet } = usePrivy();
   const { login } = useLogin();
   const { logout } = useLogout();
   const { wallets } = useWallets();
   const sa = useSmartAccount();
+  // Headless email-OTP primitives — used to gate the wallet export behind a
+  // fresh confirmation code Privy sends to the user's email. Hook is mounted
+  // unconditionally per React rules; we only call sendCode / loginWithCode
+  // from the export flow.
+  const { sendCode: privySendEmailCode, loginWithCode: privyLoginWithEmailCode } = useLoginWithEmail();
 
   const [balance, setBalance] = useState<WalletBalance | null>(null);
   const [busy, setBusy] = useState(false);
@@ -241,8 +257,51 @@ export function usePrivyWallet(): WalletWithActions {
     }
   }, [logout, wallets]);
 
+  // Find the embedded Privy wallet (the EOA Privy provisions for email/social
+  // signups). It's the signer behind the smart account. Injected wallets
+  // (Rabby/MetaMask/Coinbase) carry their own walletClientType.
+  const embeddedWallet = useMemo(
+    () => wallets.find((w) => w.walletClientType === "privy") ?? null,
+    [wallets],
+  );
+
+  const exportEmail = user?.email?.address ?? null;
+
+  const requestExportCode = useCallback(async () => {
+    if (!embeddedWallet) {
+      throw new Error("No embedded wallet to export");
+    }
+    if (!exportEmail) {
+      // Embedded-wallet users always sign up via email in our config
+      // (loginMethods: ["email", "wallet"], embedded only for email signups).
+      // If this fires the user is on an OAuth / passkey path we haven't wired.
+      throw new Error("Export requires an email-linked account");
+    }
+    // disableSignup=true: we know the user exists; this is a re-auth code,
+    // not an enrollment flow.
+    await privySendEmailCode({ email: exportEmail, disableSignup: true });
+  }, [embeddedWallet, exportEmail, privySendEmailCode]);
+
+  const verifyExportCodeAndReveal = useCallback(async (code: string) => {
+    if (!embeddedWallet) {
+      throw new Error("No embedded wallet to export");
+    }
+    const trimmed = code.trim();
+    if (!trimmed) {
+      throw new Error("Enter the 6-digit code from your email");
+    }
+    // loginWithCode verifies the OTP against the same email. The user is
+    // already authenticated under this email, so on success it's effectively
+    // a session refresh — no identity switch. On a bad code it rejects, and
+    // we surface the error to the caller without opening the export modal.
+    await privyLoginWithEmailCode({ code: trimmed });
+    // Verified — open Privy's iframe-isolated key reveal.
+    await privyExportWallet({ address: embeddedWallet.address });
+  }, [embeddedWallet, privyLoginWithEmailCode, privyExportWallet]);
+
   const snapshot: WalletWithActions = useMemo(() => {
     const loading = !ready || busy || sa.status === "loading" || (authenticated && sa.status === "idle");
+    const canExport = !!embeddedWallet && !!exportEmail;
     if (sa.status === "ready") {
       return {
         ...DISCONNECTED,
@@ -255,6 +314,9 @@ export function usePrivyWallet(): WalletWithActions {
         connect,
         refresh,
         disconnect,
+        exportEmail: canExport ? exportEmail : null,
+        requestExportCode: canExport ? requestExportCode : null,
+        verifyExportCodeAndReveal: canExport ? verifyExportCodeAndReveal : null,
       };
     }
     return {
@@ -264,8 +326,11 @@ export function usePrivyWallet(): WalletWithActions {
       connect,
       refresh,
       disconnect,
+      exportEmail: null,
+      requestExportCode: null,
+      verifyExportCodeAndReveal: null,
     };
-  }, [ready, busy, sa, authenticated, balance, error, connect, refresh, disconnect]);
+  }, [ready, busy, sa, authenticated, balance, error, connect, refresh, disconnect, embeddedWallet, exportEmail, requestExportCode, verifyExportCodeAndReveal]);
 
   return snapshot;
 }
