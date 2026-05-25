@@ -166,11 +166,16 @@ def _ttl(expiry: int | None) -> str:
     return f"{h}h {m:02d}m"
 
 
-def _market_link(market_id: int, tkr: str) -> str:
-    return f"{WEB_BASE}/#/markets/{tkr.lower()}"
+def _market_link(market_id: int, tkr: str | None) -> str:
+    # tkr can be None for historical/legacy markets where the symbol field
+    # is unpopulated in the API response. Coerce to a safe placeholder so
+    # the link still resolves (the frontend route falls back to market_id
+    # when the symbol slug doesn't match a known market).
+    safe_tkr = (tkr or "rugged").lower()
+    return f"{WEB_BASE}/#/markets/{safe_tkr}"
 
 
-def _market_keyboard(market_id: int, tkr: str) -> InlineKeyboardMarkup:
+def _market_keyboard(market_id: int, tkr: str | None) -> InlineKeyboardMarkup:
     base = _market_link(market_id, tkr)
     return InlineKeyboardMarkup([
         [
@@ -182,7 +187,12 @@ def _market_keyboard(market_id: int, tkr: str) -> InlineKeyboardMarkup:
 
 
 def _market_card(m: dict[str, Any]) -> str:
-    symbol = m.get("symbol", "RUGGED")
+    # `m.get(key, default)` returns the default only when the key is MISSING.
+    # If the key is present and the value is `None` (e.g. historical markets
+    # where the symbol column is unpopulated), get() returns None and any
+    # downstream .lower() / .upper() blows up. Use `or` so we get the default
+    # for both missing AND None.
+    symbol = m.get("symbol") or "RUGGED"
     chain = (m.get("chain") or "solana").upper()
     prob_bps = m.get("seed_probability_bps") or 0
     prob_pct = prob_bps / 100
@@ -271,7 +281,8 @@ async def cmd_markets(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
     open_markets.sort(key=lambda m: m.get("seed_probability_bps") or 0, reverse=True)
     lines = ["*Top open markets*"]
     for m in open_markets[:5]:
-        symbol = m.get("symbol", "RUGGED")
+        # See _market_card for why we use `or` rather than the get() default.
+        symbol = m.get("symbol") or "RUGGED"
         prob = (m.get("seed_probability_bps") or 0) / 100
         pool = (m.get("yes_pool", 0) + m.get("no_pool", 0)) / 1_000_000
         lines.append(
@@ -383,7 +394,7 @@ async def _broadcast_new_markets(
 
     for m in markets:
         text = _market_card(m)
-        keyboard = _market_keyboard(m.get("market_id", 0), m.get("symbol", "rug"))
+        keyboard = _market_keyboard(m.get("market_id", 0), m.get("symbol") or "rug")
         for chat_id in list(subs):
             try:
                 await application.bot.send_message(
