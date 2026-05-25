@@ -16,7 +16,7 @@ import {
   transferUsdc as _smartTransferUsdc,
 } from "../lib/smartBet";
 import { ERC20_ABI } from "../abis";
-import { CONTRACTS } from "../config";
+import { API_BASE, CONTRACTS } from "../config";
 import { publicClient as _viemPublic } from "../lib/viemClient";
 
 // Compatibility shim: the prototype used the CDN's `window.qrcode` global.
@@ -50,7 +50,10 @@ function fmtTtl(s) {
    the UI renders a loading / empty / error state instead.
    ---------------------------------------------------------------- */
 
-const API_BASE = (typeof window !== "undefined" && window.RUGGED_API_BASE) || "/api";
+// API_BASE comes from config.ts (reads VITE_API_BASE env var, falls back to
+// "/api" in dev where Vite proxies same-origin). The window-global fallback
+// below was a legacy CDN-Babel pattern; we keep the window assign for any
+// other prototype file that still reads window.RUGGED_API_BASE (see app.jsx).
 
 // ---------------------------------------------------------------
 // Per-browser identity. A stable UUIDv4 lives in localStorage as
