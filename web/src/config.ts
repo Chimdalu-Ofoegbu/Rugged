@@ -16,9 +16,14 @@
 export const PRIVY_APP_ID = import.meta.env.VITE_PRIVY_APP_ID as string | undefined;
 
 // REST endpoint for the FastAPI backend.
-//   - In dev, Vite proxies /api to :8001 (see vite.config.ts).
-//   - In prod, FastAPI serves the built SPA, so /api is same-origin.
-export const API_BASE = "/api";
+//   - In dev, Vite proxies /api to :8001 (see vite.config.ts), so the default
+//     same-origin "/api" works.
+//   - In prod-mode-1 (legacy), FastAPI serves the built SPA, so "/api" is
+//     also same-origin and the default works.
+//   - In prod-mode-2 (split deploy: Vercel frontend + Railway backend), set
+//     VITE_API_BASE to the absolute API URL, e.g.
+//     "https://rugged-api-production-xxxx.up.railway.app/api".
+export const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined) ?? "/api";
 
 // Arc Testnet chain config. The RPC URL must be reachable from the user's
 // browser; for testnet that's fine.

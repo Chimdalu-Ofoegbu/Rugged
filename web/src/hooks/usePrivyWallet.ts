@@ -23,7 +23,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLogin, useLogout, usePrivy, useWallets } from "@privy-io/react-auth";
 import type { SmartAccountClient } from "permissionless";
 
-import { CONTRACTS } from "../config";
+import { API_BASE, CONTRACTS } from "../config";
 import { ERC20_ABI } from "../abis";
 import { publicClient } from "../lib/viemClient";
 import { useSmartAccount } from "./useSmartAccount";
@@ -122,7 +122,7 @@ export function usePrivyWallet(): WalletWithActions {
     if (sa.status !== "ready" || registered) return;
     const userId = (typeof window !== "undefined" && window.localStorage?.getItem("rugged_user_id")) || "";
     if (!userId) return;
-    fetch("/api/wallet/register", {
+    fetch(`${API_BASE}/wallet/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
