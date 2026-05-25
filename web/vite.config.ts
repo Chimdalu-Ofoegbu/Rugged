@@ -41,13 +41,12 @@ export default defineConfig({
       // through Vite — same-origin from the page's perspective. In prod
       // the FastAPI backend should serve the same path.
       "/arc-rpc": {
-        target: "https://rpc.testnet.arc-node.thecanteenapp.com",
+        // Official Arc testnet RPC (per Arc docs). Previously routed via a
+        // third-party (canteenapp) which started returning 503 under load
+        // during the demo — switched to the official endpoint for resilience.
+        target: "https://rpc.testnet.arc.network",
         changeOrigin: true,
-        rewrite: (path) =>
-          path.replace(
-            /^\/arc-rpc/,
-            "/v1/swrm_06df66a5232ce2959f69ccdb230322a14db7008372efac51e0c902dbb0ce7a3f",
-          ),
+        rewrite: (path) => path.replace(/^\/arc-rpc/, ""),
         secure: true,
       },
     },

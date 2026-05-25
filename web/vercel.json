@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/arc-rpc",
-      "destination": "https://rpc.testnet.arc-node.thecanteenapp.com/v1/swrm_06df66a5232ce2959f69ccdb230322a14db7008372efac51e0c902dbb0ce7a3f"
+      "destination": "https://rpc.testnet.arc.network"
     },
     {
       "source": "/arc-rpc/:path*",
-      "destination": "https://rpc.testnet.arc-node.thecanteenapp.com/v1/swrm_06df66a5232ce2959f69ccdb230322a14db7008372efac51e0c902dbb0ce7a3f/:path*"
+      "destination": "https://rpc.testnet.arc.network/:path*"
     }
   ]
 }
